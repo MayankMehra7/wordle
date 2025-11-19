@@ -30,7 +30,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       roomCode: room.roomCode,
-      difficulty: room.difficulty,
+      difficulty: room.currentDifficulty || room.difficulty,
+      currentDifficulty: room.currentDifficulty || room.difficulty,
+      roundNumber: room.roundNumber || 0,
       players: sortedPlayers,
       createdAt: room.createdAt,
       expiresAt: room.expiresAt

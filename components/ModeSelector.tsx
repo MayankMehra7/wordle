@@ -29,7 +29,7 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({
       return;
     }
     setError('');
-    onCreateRoom(playerName.trim(), difficulty);
+    onCreateRoom(playerName.trim(), 'easy'); // Always start with easy
   };
 
   const handleJoinRoom = () => {
@@ -98,40 +98,11 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({
               />
             </div>
             
-            <div>
-              <label className="block text-gray-300 mb-2 font-semibold">Difficulty</label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setDifficulty('easy')}
-                  className={`py-2 rounded-lg font-semibold transition-colors ${
-                    difficulty === 'easy'
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  Easy
-                </button>
-                <button
-                  onClick={() => setDifficulty('medium')}
-                  className={`py-2 rounded-lg font-semibold transition-colors ${
-                    difficulty === 'medium'
-                      ? 'bg-yellow-500 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  Medium
-                </button>
-                <button
-                  onClick={() => setDifficulty('hard')}
-                  className={`py-2 rounded-lg font-semibold transition-colors ${
-                    difficulty === 'hard'
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  Hard
-                </button>
-              </div>
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <p className="text-gray-300 text-sm text-center">
+                🔄 Difficulty rotates automatically:<br/>
+                <span className="text-green-400">Easy</span> → <span className="text-yellow-400">Medium</span> → <span className="text-red-400">Hard</span> → repeat
+              </p>
             </div>
             
             {error && (

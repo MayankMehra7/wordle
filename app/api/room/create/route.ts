@@ -34,15 +34,15 @@ export async function POST(request: Request) {
       existingRoom = await roomsCollection.findOne({ roomCode });
     }
 
-    // Get today's word for this difficulty
+    // Get first word (always easy for round 0)
     const wordsCollection = db.collection('words');
-    const dailySeed = getDailySeed();
-    const count = await wordsCollection.countDocuments({ difficulty });
-    const dailyIndex = dailySeed % count;
+    const firstDifficulty = 'easy';
+    const count = await wordsCollection.countDocuments({ difficulty: firstDifficulty });
+    const randomIndex = Math.floor(Math.random() * count);
     
     const words = await wordsCollection
-      .find({ difficulty })
-      .skip(dailyIndex)
+      .find({ difficulty: firstDifficulty })
+      .skip(randomIndex)
       .limit(1)
       .toArray();
 
@@ -55,11 +55,13 @@ export async function POST(request: Request) {
 
     const targetWord = words[0].word;
 
-    // Create room
+    // Create room - start with easy difficulty (round 0)
     const room = {
       roomCode,
-      difficulty,
+      difficulty: 'easy', // First round is always easy
+      currentDifficulty: 'easy',
       targetWord,
+      roundNumber: 0,
       players: [
         {
           name: playerName,
@@ -79,7 +81,9 @@ export async function POST(request: Request) {
     return NextResponse.json({
       roomCode,
       targetWord,
-      difficulty
+      difficulty: 'easy',
+      currentDifficulty: 'easy',
+      roundNumber: 0
     });
   } catch (error) {
     console.error('Error creating room:', error);

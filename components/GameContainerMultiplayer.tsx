@@ -45,6 +45,8 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
   const [players, setPlayers] = useState<Player[]>([]);
   const [roundComplete, setRoundComplete] = useState<boolean>(false);
   const [gameWinner, setGameWinner] = useState<string | null>(null);
+  const [currentDifficulty, setCurrentDifficulty] = useState<string>(difficulty);
+  const [roundNumber, setRoundNumber] = useState<number>(0);
   const gameRef = useRef<HTMLDivElement>(null);
 
   const maxGuesses = 6;
@@ -57,6 +59,8 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       if (response.ok) {
         const data = await response.json();
         setPlayers(data.players);
+        setCurrentDifficulty(data.currentDifficulty || data.difficulty);
+        setRoundNumber(data.roundNumber || 0);
         
         // Check if anyone reached 200 points
         const winner = data.players.find((p: Player) => p.score >= winningScore);
@@ -167,15 +171,23 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
     }
   };
 
-  // Start new round
+  // Start new round with rotating difficulty
   const startNewRound = async () => {
     try {
-      const response = await fetch(`/api/word?difficulty=${difficulty}`);
+      const response = await fetch('/api/room/nextword', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomCode }),
+      });
+      
       if (!response.ok) {
         throw new Error('Failed to fetch word');
       }
+      
       const data = await response.json();
       setTargetWord(data.word);
+      setCurrentDifficulty(data.difficulty);
+      setRoundNumber(data.roundNumber);
       setGuesses([]);
       setCurrentGuess('');
       setGameStatus('playing');
@@ -183,6 +195,9 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       setLetterStates({});
       setShowModal(false);
       setRoundComplete(false);
+      
+      // Fetch updated room status
+      await fetchRoomStatus();
     } catch (err) {
       setError('Failed to load new word. Please try again.');
       console.error(err);
@@ -262,7 +277,10 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
 
         <h1 className="text-4xl font-bold text-center mb-2 text-white">Wordle Competition</h1>
         <p className="text-center text-gray-400 mb-4">
-          First to {winningScore} points wins! • {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Mode
+          First to {winningScore} points wins! • Round {roundNumber + 1} • {currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} Mode
+        </p>
+        <p className="text-center text-sm text-gray-500 mb-4">
+          🔄 Difficulty rotates: Easy → Medium → Hard → Easy...
         </p>
 
         {gameWinner && (
