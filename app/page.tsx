@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import GameContainer from '@/components/GameContainer';
 import ModeSelection from '@/components/ModeSelection';
 import CompetitionSetup from '@/components/CompetitionSetup';
@@ -15,10 +16,42 @@ interface CompetitionData {
 }
 
 export default function Home() {
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<AppMode>('select');
   const [competitionData, setCompetitionData] = useState<CompetitionData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Handle join from URL params
+  useEffect(() => {
+    const urlMode = searchParams.get('mode');
+    const urlCode = searchParams.get('code');
+    const urlPlayer = searchParams.get('player');
+
+    if (urlMode === 'competition' && urlCode && urlPlayer) {
+      setLoading(true);
+      
+      // Fetch competition details
+      fetch(`/api/competition/status?code=${urlCode}`)
+        .then(res => res.json())
+        .then(data => {
+          setCompetitionData({
+            code: urlCode,
+            playerName: urlPlayer,
+            difficulty: data.difficulty,
+            targetWord: data.targetWord,
+          });
+          setMode('competition-play');
+        })
+        .catch(err => {
+          console.error('Error loading competition:', err);
+          setError('Failed to load competition');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [searchParams]);
 
   const handleModeSelect = (selectedMode: 'solo' | 'competition') => {
     if (selectedMode === 'solo') {
