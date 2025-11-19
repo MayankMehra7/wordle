@@ -49,6 +49,13 @@ export async function POST(request: Request) {
     // Get updated room data
     const updatedRoom = await roomsCollection.findOne({ roomCode: roomCode.toUpperCase() });
 
+    if (!updatedRoom) {
+      return NextResponse.json(
+        { error: 'Room not found after update' },
+        { status: 404 }
+      );
+    }
+
     // Sort players by score (descending)
     const sortedPlayers = updatedRoom.players.sort((a: any, b: any) => b.score - a.score);
 
