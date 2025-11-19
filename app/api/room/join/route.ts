@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
     await roomsCollection.updateOne(
       { roomCode: roomCode.toUpperCase() },
-      { $push: { players: newPlayer } }
+      { $push: { players: newPlayer } } as any
     );
 
     return NextResponse.json({
