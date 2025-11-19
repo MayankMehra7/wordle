@@ -7,7 +7,7 @@ interface ModalProps {
   isOpen: boolean;
   gameWon: boolean;
   targetWord: string;
-  onPlayAgain: () => void;
+  onPlayAgain?: () => void;
   attempts: number;
 }
 
@@ -61,12 +61,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, gameWon, targetWord, onPlayAgain,
             {screenshotLoading ? '📸 Capturing...' : '📸 Screenshot'}
           </button>
 
-          <button
-            onClick={onPlayAgain}
-            className="bg-correct hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg"
-          >
-            Play Again
-          </button>
+          {onPlayAgain && (
+            <button
+              onClick={onPlayAgain}
+              className="bg-correct hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg"
+            >
+              Play Again
+            </button>
+          )}
         </div>
       </div>
     </div>

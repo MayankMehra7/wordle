@@ -1,185 +1,134 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import GameContainer from '@/components/GameContainer';
-import ModeSelection from '@/components/ModeSelection';
-import CompetitionSetup from '@/components/CompetitionSetup';
-import CodeDisplay from '@/components/CodeDisplay';
-
-type AppMode = 'select' | 'solo' | 'competition-setup' | 'competition-code' | 'competition-play';
+import ModeSelector from '@/components/ModeSelector';
 
 interface CompetitionData {
-  code: string;
+  roomCode: string;
   playerName: string;
   difficulty: 'easy' | 'medium' | 'hard';
   targetWord: string;
 }
 
 export default function Home() {
-  const searchParams = useSearchParams();
-  const [mode, setMode] = useState<AppMode>('select');
+  const [gameMode, setGameMode] = useState<'menu' | 'solo' | 'multiplayer'>('menu');
   const [competitionData, setCompetitionData] = useState<CompetitionData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Handle join from URL params
-  useEffect(() => {
-    const urlMode = searchParams.get('mode');
-    const urlCode = searchParams.get('code');
-    const urlPlayer = searchParams.get('player');
-
-    if (urlMode === 'competition' && urlCode && urlPlayer) {
-      setLoading(true);
-      
-      // Fetch competition details
-      fetch(`/api/competition/status?code=${urlCode}`)
-        .then(res => res.json())
-        .then(data => {
-          setCompetitionData({
-            code: urlCode,
-            playerName: urlPlayer,
-            difficulty: data.difficulty,
-            targetWord: data.targetWord,
-          });
-          setMode('competition-play');
-        })
-        .catch(err => {
-          console.error('Error loading competition:', err);
-          setError('Failed to load competition');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [searchParams]);
-
-  const handleModeSelect = (selectedMode: 'solo' | 'competition') => {
-    if (selectedMode === 'solo') {
-      setMode('solo');
-    } else {
-      setMode('competition-setup');
+  const handleSelectMode = (mode: 'solo' | 'multiplayer') => {
+    if (mode === 'solo') {
+      setGameMode('solo');
+      setCompetitionData(null);
     }
   };
 
-  const handleCompetitionStart = async (data: {
-    mode: 'create' | 'join';
-    playerName: string;
-    code?: string;
-    difficulty?: 'easy' | 'medium' | 'hard';
-  }) => {
-    setLoading(true);
+  const handleCreateRoom = async (playerName: string, difficulty: string) => {
+    setIsLoading(true);
     setError('');
-
+    
     try {
-      if (data.mode === 'create') {
-        const response = await fetch('/api/competition/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            playerName: data.playerName,
-            difficulty: data.difficulty,
-          }),
-        });
+      const response = await fetch('/api/room/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ playerName, difficulty }),
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to create competition');
-        }
-
-        const result = await response.json();
-        
-        // Fetch the competition to get target word
-        const statusResponse = await fetch(`/api/competition/status?code=${result.code}`);
-        const statusData = await statusResponse.json();
-
-        setCompetitionData({
-          code: result.code,
-          playerName: data.playerName,
-          difficulty: result.difficulty,
-          targetWord: statusData.targetWord,
-        });
-        setMode('competition-code');
-      } else {
-        const response = await fetch('/api/competition/join', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: data.code,
-            playerName: data.playerName,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to join competition');
-        }
-
-        const result = await response.json();
-        setCompetitionData({
-          code: result.code,
-          playerName: data.playerName,
-          difficulty: result.difficulty,
-          targetWord: result.targetWord,
-        });
-        setMode('competition-play');
+      if (!response.ok) {
+        throw new Error('Failed to create room');
       }
-    } catch (err: any) {
-      setError(err.message);
-      alert(err.message);
+
+      const data = await response.json();
+      
+      setCompetitionData({
+        roomCode: data.roomCode,
+        playerName,
+        difficulty: difficulty as 'easy' | 'medium' | 'hard',
+        targetWord: data.targetWord,
+      });
+      setGameMode('multiplayer');
+    } catch (err) {
+      setError('Failed to create room. Please try again.');
+      console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  if (loading) {
+  const handleJoinRoom = async (roomCode: string, playerName: string) => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch('/api/room/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ roomCode, playerName }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to join room');
+      }
+
+      const data = await response.json();
+      
+      setCompetitionData({
+        roomCode: data.roomCode,
+        playerName,
+        difficulty: data.difficulty,
+        targetWord: data.targetWord,
+      });
+      setGameMode('multiplayer');
+    } catch (err: any) {
+      setError(err.message || 'Failed to join room. Please try again.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBackToMenu = () => {
+    setGameMode('menu');
+    setCompetitionData(null);
+    setError('');
+  };
+
+  if (isLoading) {
     return (
-      <main className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-2xl">Loading...</div>
-      </main>
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-2xl text-white">Loading...</div>
+      </div>
     );
   }
 
-  if (mode === 'select') {
+  if (gameMode === 'menu') {
     return (
-      <main className="min-h-screen bg-gray-900">
-        <ModeSelection onSelectMode={handleModeSelect} />
-      </main>
-    );
-  }
-
-  if (mode === 'competition-setup') {
-    return (
-      <main className="min-h-screen bg-gray-900">
-        <CompetitionSetup
-          onBack={() => setMode('select')}
-          onStart={handleCompetitionStart}
+      <>
+        <ModeSelector
+          onSelectMode={handleSelectMode}
+          onCreateRoom={handleCreateRoom}
+          onJoinRoom={handleJoinRoom}
         />
-      </main>
-    );
-  }
-
-  if (mode === 'competition-code' && competitionData) {
-    return (
-      <main className="min-h-screen bg-gray-900">
-        <CodeDisplay
-          code={competitionData.code}
-          onContinue={() => setMode('competition-play')}
-        />
-      </main>
+        {error && (
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            {error}
+          </div>
+        )}
+      </>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-900">
-      <GameContainer
-        competitionMode={mode === 'competition-play'}
-        competitionData={competitionData}
-        onBackToMenu={() => {
-          setMode('select');
-          setCompetitionData(null);
-        }}
-      />
-    </main>
+    <GameContainer
+      competitionMode={gameMode === 'multiplayer'}
+      competitionData={competitionData}
+      onBackToMenu={handleBackToMenu}
+    />
   );
 }
