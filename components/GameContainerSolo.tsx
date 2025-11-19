@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import html2canvas from 'html2canvas';
+import React, { useState, useEffect, useCallback } from 'react';
 import GameBoard from './GameBoard';
 import Keyboard from './Keyboard';
 import Modal from './Modal';
@@ -25,7 +24,6 @@ const GameContainerSolo: React.FC<GameContainerSoloProps> = ({ onBackToMenu }) =
   const [showModal, setShowModal] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
-  const gameRef = useRef<HTMLDivElement>(null);
 
   const maxGuesses = 6;
 
@@ -165,25 +163,7 @@ const GameContainerSolo: React.FC<GameContainerSoloProps> = ({ onBackToMenu }) =
     return () => window.removeEventListener('keydown', handlePhysicalKeyPress);
   }, [handleKeyPress, gameStatus]);
 
-  // Screenshot functionality
-  const takeScreenshot = async () => {
-    if (!gameRef.current) return;
 
-    try {
-      const canvas = await html2canvas(gameRef.current, {
-        backgroundColor: '#111827',
-        scale: 2,
-      });
-      
-      const link = document.createElement('a');
-      link.download = `wordle-solo-${new Date().getTime()}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-    } catch (err) {
-      console.error('Error taking screenshot:', err);
-      alert('Failed to take screenshot');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -210,20 +190,14 @@ const GameContainerSolo: React.FC<GameContainerSoloProps> = ({ onBackToMenu }) =
   }
 
   return (
-    <div ref={gameRef} className="flex flex-col items-center justify-between min-h-screen py-8 bg-gray-900">
+    <div className="flex flex-col items-center justify-between min-h-screen py-8 bg-gray-900">
       <div className="w-full max-w-2xl px-4">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-start items-center mb-4">
           <button
             onClick={onBackToMenu}
             className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
           >
             ← Back to Menu
-          </button>
-          <button
-            onClick={takeScreenshot}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2"
-          >
-            📸 Screenshot
           </button>
         </div>
 
