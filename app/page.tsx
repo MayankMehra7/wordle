@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import GameContainer from '@/components/GameContainer';
 import ModeSelector from '@/components/ModeSelector';
+import GameContainerSolo from '@/components/GameContainerSolo';
+import GameContainerMultiplayer from '@/components/GameContainerMultiplayer';
 
-interface CompetitionData {
+type AppMode = 'menu' | 'solo' | 'multiplayer';
+
+interface MultiplayerData {
   roomCode: string;
   playerName: string;
   difficulty: 'easy' | 'medium' | 'hard';
@@ -12,28 +15,26 @@ interface CompetitionData {
 }
 
 export default function Home() {
-  const [gameMode, setGameMode] = useState<'menu' | 'solo' | 'multiplayer'>('menu');
-  const [competitionData, setCompetitionData] = useState<CompetitionData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<AppMode>('menu');
+  const [multiplayerData, setMultiplayerData] = useState<MultiplayerData | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSelectMode = (mode: 'solo' | 'multiplayer') => {
-    if (mode === 'solo') {
-      setGameMode('solo');
-      setCompetitionData(null);
+  const handleSelectMode = (selectedMode: 'solo' | 'multiplayer') => {
+    if (selectedMode === 'solo') {
+      setMode('solo');
     }
+    // For multiplayer, wait for room creation/join
   };
 
   const handleCreateRoom = async (playerName: string, difficulty: string) => {
-    setIsLoading(true);
+    setLoading(true);
     setError('');
     
     try {
       const response = await fetch('/api/room/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerName, difficulty }),
       });
 
@@ -42,32 +43,29 @@ export default function Home() {
       }
 
       const data = await response.json();
-      
-      setCompetitionData({
+      setMultiplayerData({
         roomCode: data.roomCode,
         playerName,
         difficulty: difficulty as 'easy' | 'medium' | 'hard',
         targetWord: data.targetWord,
       });
-      setGameMode('multiplayer');
+      setMode('multiplayer');
     } catch (err) {
       setError('Failed to create room. Please try again.');
       console.error(err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const handleJoinRoom = async (roomCode: string, playerName: string) => {
-    setIsLoading(true);
+    setLoading(true);
     setError('');
     
     try {
       const response = await fetch('/api/room/join', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomCode, playerName }),
       });
 
@@ -77,29 +75,29 @@ export default function Home() {
       }
 
       const data = await response.json();
-      
-      setCompetitionData({
+      setMultiplayerData({
         roomCode: data.roomCode,
         playerName,
         difficulty: data.difficulty,
         targetWord: data.targetWord,
       });
-      setGameMode('multiplayer');
+      setMode('multiplayer');
     } catch (err: any) {
       setError(err.message || 'Failed to join room. Please try again.');
       console.error(err);
+      alert(err.message || 'Failed to join room');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const handleBackToMenu = () => {
-    setGameMode('menu');
-    setCompetitionData(null);
+    setMode('menu');
+    setMultiplayerData(null);
     setError('');
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
         <div className="text-2xl text-white">Loading...</div>
@@ -107,28 +105,31 @@ export default function Home() {
     );
   }
 
-  if (gameMode === 'menu') {
+  if (mode === 'menu') {
     return (
-      <>
-        <ModeSelector
-          onSelectMode={handleSelectMode}
-          onCreateRoom={handleCreateRoom}
-          onJoinRoom={handleJoinRoom}
-        />
-        {error && (
-          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
-            {error}
-          </div>
-        )}
-      </>
+      <ModeSelector
+        onSelectMode={handleSelectMode}
+        onCreateRoom={handleCreateRoom}
+        onJoinRoom={handleJoinRoom}
+      />
     );
   }
 
-  return (
-    <GameContainer
-      competitionMode={gameMode === 'multiplayer'}
-      competitionData={competitionData}
-      onBackToMenu={handleBackToMenu}
-    />
-  );
+  if (mode === 'solo') {
+    return <GameContainerSolo onBackToMenu={handleBackToMenu} />;
+  }
+
+  if (mode === 'multiplayer' && multiplayerData) {
+    return (
+      <GameContainerMultiplayer
+        roomCode={multiplayerData.roomCode}
+        playerName={multiplayerData.playerName}
+        difficulty={multiplayerData.difficulty}
+        initialWord={multiplayerData.targetWord}
+        onBackToMenu={handleBackToMenu}
+      />
+    );
+  }
+
+  return null;
 }

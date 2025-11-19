@@ -5,96 +5,59 @@ import html2canvas from 'html2canvas';
 import GameBoard from './GameBoard';
 import Keyboard from './Keyboard';
 import Modal from './Modal';
-import Leaderboard from './Leaderboard';
 
 type GameStatus = 'playing' | 'won' | 'lost';
 type LetterStatus = 'correct' | 'present' | 'absent' | 'empty';
 type KeyStatus = 'correct' | 'present' | 'absent' | 'unused';
 
-interface Player {
-  name: string;
-  score: number;
-  attempts: number;
-  completed: boolean;
-  guesses: string[];
-}
-
-interface GameContainerMultiplayerProps {
-  roomCode: string;
-  playerName: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  initialWord: string;
+interface GameContainerSoloProps {
   onBackToMenu: () => void;
 }
 
-const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
-  roomCode,
-  playerName,
-  difficulty,
-  initialWord,
-  onBackToMenu,
-}) => {
-  const [targetWord, setTargetWord] = useState<string>(initialWord);
+const GameContainerSolo: React.FC<GameContainerSoloProps> = ({ onBackToMenu }) => {
+  const [targetWord, setTargetWord] = useState<string>('');
   const [guesses, setGuesses] = useState<string[]>([]);
   const [currentGuess, setCurrentGuess] = useState<string>('');
   const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
   const [feedback, setFeedback] = useState<LetterStatus[][]>([]);
   const [letterStates, setLetterStates] = useState<{ [key: string]: KeyStatus }>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [roundComplete, setRoundComplete] = useState<boolean>(false);
-  const [gameWinner, setGameWinner] = useState<string | null>(null);
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const gameRef = useRef<HTMLDivElement>(null);
 
   const maxGuesses = 6;
-  const winningScore = 200;
 
-  // Fetch room status
-  const fetchRoomStatus = useCallback(async () => {
+  // Fetch new word
+  const fetchNewWord = useCallback(async () => {
+    setIsLoading(true);
+    setError('');
     try {
-      const response = await fetch(`/api/room/status?roomCode=${roomCode}`);
-      if (response.ok) {
-        const data = await response.json();
-        setPlayers(data.players);
-        
-        // Check if anyone reached 200 points
-        const winner = data.players.find((p: Player) => p.score >= winningScore);
-        if (winner) {
-          setGameWinner(winner.name);
-        }
+      const response = await fetch(`/api/word?difficulty=${difficulty}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch word');
       }
+      const data = await response.json();
+      setTargetWord(data.word);
+      setGuesses([]);
+      setCurrentGuess('');
+      setGameStatus('playing');
+      setFeedback([]);
+      setLetterStates({});
+      setShowModal(false);
     } catch (err) {
-      console.error('Error fetching room status:', err);
+      setError('Failed to load word. Please refresh the page.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-  }, [roomCode]);
+  }, [difficulty]);
 
-  // Poll room status every 3 seconds
+  // Initialize game
   useEffect(() => {
-    fetchRoomStatus();
-    const interval = setInterval(fetchRoomStatus, 3000);
-    return () => clearInterval(interval);
-  }, [fetchRoomStatus]);
-
-  // Update room with player progress
-  const updateRoom = useCallback(async () => {
-    try {
-      await fetch('/api/room/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomCode,
-          playerName,
-          guesses,
-          completed: gameStatus !== 'playing',
-          attempts: guesses.length,
-        }),
-      });
-      await fetchRoomStatus();
-    } catch (err) {
-      console.error('Error updating room:', err);
-    }
-  }, [roomCode, playerName, guesses, gameStatus, fetchRoomStatus]);
+    fetchNewWord();
+  }, [fetchNewWord]);
 
   // Update letter states based on feedback
   const updateLetterStates = (guess: string, guessFeedback: LetterStatus[]) => {
@@ -118,14 +81,16 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
 
   // Submit guess
   const submitGuess = async () => {
-    if (currentGuess.length !== 5 || gameStatus !== 'playing') {
+    if (currentGuess.length !== 5) {
       return;
     }
 
     try {
       const response = await fetch('/api/validate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           guess: currentGuess,
           targetWord: targetWord,
@@ -148,44 +113,22 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       // Check win condition
       if (data.isCorrect) {
         setGameStatus('won');
-        setRoundComplete(true);
         setTimeout(() => setShowModal(true), 500);
-        await updateRoom();
+        // Auto-start new game after win
+        setTimeout(() => {
+          fetchNewWord();
+        }, 3000);
         return;
       }
 
       // Check loss condition
       if (newGuesses.length >= maxGuesses) {
         setGameStatus('lost');
-        setRoundComplete(true);
         setTimeout(() => setShowModal(true), 500);
-        await updateRoom();
       }
     } catch (err) {
       console.error('Error submitting guess:', err);
       setError('Failed to submit guess. Please try again.');
-    }
-  };
-
-  // Start new round
-  const startNewRound = async () => {
-    try {
-      const response = await fetch(`/api/word?difficulty=${difficulty}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch word');
-      }
-      const data = await response.json();
-      setTargetWord(data.word);
-      setGuesses([]);
-      setCurrentGuess('');
-      setGameStatus('playing');
-      setFeedback([]);
-      setLetterStates({});
-      setShowModal(false);
-      setRoundComplete(false);
-    } catch (err) {
-      setError('Failed to load new word. Please try again.');
-      console.error(err);
     }
   };
 
@@ -233,7 +176,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       });
       
       const link = document.createElement('a');
-      link.download = `wordle-${roomCode}-${playerName}.png`;
+      link.download = `wordle-solo-${new Date().getTime()}.png`;
       link.href = canvas.toDataURL();
       link.click();
     } catch (err) {
@@ -242,9 +185,33 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-2xl text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error && !targetWord) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-center">
+          <div className="text-2xl text-red-500 mb-4">{error}</div>
+          <button
+            onClick={fetchNewWord}
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={gameRef} className="flex flex-col items-center justify-between min-h-screen py-8 bg-gray-900">
-      <div className="w-full max-w-4xl px-4">
+      <div className="w-full max-w-2xl px-4">
         <div className="flex justify-between items-center mb-4">
           <button
             onClick={onBackToMenu}
@@ -260,39 +227,62 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
           </button>
         </div>
 
-        <h1 className="text-4xl font-bold text-center mb-2 text-white">Wordle Competition</h1>
+        <h1 className="text-4xl font-bold text-center mb-2 text-white">Wordle</h1>
         <p className="text-center text-gray-400 mb-4">
-          First to {winningScore} points wins! • {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Mode
+          Guess the 5-letter word in {maxGuesses} tries
         </p>
+        
+        {/* Difficulty Selector */}
+        <div className="flex justify-center gap-2 mb-6">
+          <button
+            onClick={() => setDifficulty('easy')}
+            disabled={gameStatus !== 'playing' && guesses.length > 0}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              difficulty === 'easy'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            } ${gameStatus !== 'playing' && guesses.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            Easy
+          </button>
+          <button
+            onClick={() => setDifficulty('medium')}
+            disabled={gameStatus !== 'playing' && guesses.length > 0}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              difficulty === 'medium'
+                ? 'bg-yellow-500 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            } ${gameStatus !== 'playing' && guesses.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            Medium
+          </button>
+          <button
+            onClick={() => setDifficulty('hard')}
+            disabled={gameStatus !== 'playing' && guesses.length > 0}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              difficulty === 'hard'
+                ? 'bg-red-500 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            } ${gameStatus !== 'playing' && guesses.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            Hard
+          </button>
+        </div>
 
-        {gameWinner && (
-          <div className="bg-yellow-500 text-black font-bold text-center py-3 px-4 rounded-lg mb-4 text-xl">
-            🎉 {gameWinner} wins the competition with {winningScore}+ points! 🎉
-          </div>
+        <p className="text-center text-sm text-gray-500 mb-4">
+          🌍 Everyone gets the same {difficulty} word today!
+        </p>
+        
+        {error && (
+          <div className="text-center text-red-500 mb-4">{error}</div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-          <div className="lg:col-span-2">
-            {error && (
-              <div className="text-center text-red-500 mb-4">{error}</div>
-            )}
-
-            <GameBoard
-              guesses={guesses}
-              currentGuess={currentGuess}
-              gameStatus={gameStatus}
-              feedback={feedback}
-            />
-          </div>
-
-          <div className="lg:col-span-1">
-            <Leaderboard
-              players={players}
-              roomCode={roomCode}
-              currentPlayer={playerName}
-            />
-          </div>
-        </div>
+        <GameBoard
+          guesses={guesses}
+          currentGuess={currentGuess}
+          gameStatus={gameStatus}
+          feedback={feedback}
+        />
       </div>
 
       <div className="w-full max-w-2xl px-4">
@@ -303,11 +293,11 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
         isOpen={showModal}
         gameWon={gameStatus === 'won'}
         targetWord={targetWord}
-        onPlayAgain={startNewRound}
+        onPlayAgain={fetchNewWord}
         attempts={guesses.length}
       />
     </div>
   );
 };
 
-export default GameContainerMultiplayer;
+export default GameContainerSolo;
