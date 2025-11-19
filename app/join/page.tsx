@@ -1,18 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function JoinTeamPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [code, setCode] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [competitionInfo, setCompetitionInfo] = useState<any>(null);
 
-  const handleVerifyCode = async () => {
-    if (!code.trim()) {
+  // Auto-fill code from URL if present
+  useEffect(() => {
+    const urlCode = searchParams.get('code');
+    if (urlCode) {
+      setCode(urlCode.toUpperCase());
+      // Auto-verify if code is 6 characters
+      if (urlCode.length === 6) {
+        handleVerifyCode(urlCode.toUpperCase());
+      }
+    }
+  }, [searchParams]);
+
+  const handleVerifyCode = async (codeToVerify?: string) => {
+    const verifyCode = codeToVerify || code;
+    
+    if (!verifyCode.trim()) {
       setError('Please enter a competition code');
       return;
     }
@@ -21,7 +36,7 @@ export default function JoinTeamPage() {
     setError('');
 
     try {
-      const response = await fetch(`/api/competition/status?code=${code.toUpperCase()}`);
+      const response = await fetch(`/api/competition/status?code=${verifyCode.toUpperCase()}`);
       
       if (!response.ok) {
         const errorData = await response.json();

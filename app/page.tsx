@@ -5,8 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import GameContainer from '@/components/GameContainer';
 import ModeSelection from '@/components/ModeSelection';
 import CompetitionSetup from '@/components/CompetitionSetup';
+import CodeDisplay from '@/components/CodeDisplay';
 
-type AppMode = 'select' | 'solo' | 'competition-setup' | 'competition-play';
+type AppMode = 'select' | 'solo' | 'competition-setup' | 'competition-code' | 'competition-play';
 
 interface CompetitionData {
   code: string;
@@ -98,7 +99,7 @@ export default function Home() {
           difficulty: result.difficulty,
           targetWord: statusData.targetWord,
         });
-        setMode('competition-play');
+        setMode('competition-code');
       } else {
         const response = await fetch('/api/competition/join', {
           method: 'POST',
@@ -153,6 +154,17 @@ export default function Home() {
         <CompetitionSetup
           onBack={() => setMode('select')}
           onStart={handleCompetitionStart}
+        />
+      </main>
+    );
+  }
+
+  if (mode === 'competition-code' && competitionData) {
+    return (
+      <main className="min-h-screen bg-gray-900">
+        <CodeDisplay
+          code={competitionData.code}
+          onContinue={() => setMode('competition-play')}
         />
       </main>
     );
