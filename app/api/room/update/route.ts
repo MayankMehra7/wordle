@@ -32,6 +32,8 @@ export async function POST(request: Request) {
     const roundPoints = completed ? Math.max(0, 7 - attempts) : 0;
     const newScore = currentScore + roundPoints;
 
+    console.log(`Player: ${playerName}, Current Score: ${currentScore}, Round Points: ${roundPoints}, New Score: ${newScore}, Attempts: ${attempts}, Completed: ${completed}`);
+
     // Update player data
     await roomsCollection.updateOne(
       { roomCode: roomCode.toUpperCase(), 'players.name': playerName },

@@ -76,7 +76,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
   }, [fetchRoomStatus]);
 
   // Update room with player progress
-  const updateRoom = useCallback(async () => {
+  const updateRoom = useCallback(async (updatedGuesses: string[], isCompleted: boolean) => {
     try {
       await fetch('/api/room/update', {
         method: 'POST',
@@ -84,16 +84,16 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
         body: JSON.stringify({
           roomCode,
           playerName,
-          guesses,
-          completed: gameStatus !== 'playing',
-          attempts: guesses.length,
+          guesses: updatedGuesses,
+          completed: isCompleted,
+          attempts: updatedGuesses.length,
         }),
       });
       await fetchRoomStatus();
     } catch (err) {
       console.error('Error updating room:', err);
     }
-  }, [roomCode, playerName, guesses, gameStatus, fetchRoomStatus]);
+  }, [roomCode, playerName, fetchRoomStatus]);
 
   // Update letter states based on feedback
   const updateLetterStates = (guess: string, guessFeedback: LetterStatus[]) => {
@@ -147,7 +147,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       // Check win condition
       if (data.isCorrect) {
         setGameStatus('won');
-        await updateRoom();
+        await updateRoom(newGuesses, true);
         // Auto-start new round after 2 seconds
         setTimeout(() => {
           startNewRound();
@@ -158,7 +158,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       // Check loss condition
       if (newGuesses.length >= maxGuesses) {
         setGameStatus('lost');
-        await updateRoom();
+        await updateRoom(newGuesses, false);
         // Auto-start new round after 2 seconds
         setTimeout(() => {
           startNewRound();
