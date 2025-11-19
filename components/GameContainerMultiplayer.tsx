@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import GameBoard from './GameBoard';
 import Keyboard from './Keyboard';
-import Modal from './Modal';
 import Leaderboard from './Leaderboard';
 
 type GameStatus = 'playing' | 'won' | 'lost';
@@ -39,10 +38,8 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
   const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
   const [feedback, setFeedback] = useState<LetterStatus[][]>([]);
   const [letterStates, setLetterStates] = useState<{ [key: string]: KeyStatus }>({});
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [players, setPlayers] = useState<Player[]>([]);
-  const [roundComplete, setRoundComplete] = useState<boolean>(false);
   const [gameWinner, setGameWinner] = useState<string | null>(null);
   const [currentDifficulty, setCurrentDifficulty] = useState<string>(difficulty);
   const [roundNumber, setRoundNumber] = useState<number>(0);
@@ -62,14 +59,14 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
         
         // Check if anyone reached 200 points
         const winner = data.players.find((p: Player) => p.score >= winningScore);
-        if (winner) {
+        if (winner && !gameWinner) {
           setGameWinner(winner.name);
         }
       }
     } catch (err) {
       console.error('Error fetching room status:', err);
     }
-  }, [roomCode]);
+  }, [roomCode, gameWinner]);
 
   // Poll room status every 3 seconds
   useEffect(() => {
@@ -150,18 +147,22 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       // Check win condition
       if (data.isCorrect) {
         setGameStatus('won');
-        setRoundComplete(true);
-        setTimeout(() => setShowModal(true), 500);
         await updateRoom();
+        // Auto-start new round after 2 seconds
+        setTimeout(() => {
+          startNewRound();
+        }, 2000);
         return;
       }
 
       // Check loss condition
       if (newGuesses.length >= maxGuesses) {
         setGameStatus('lost');
-        setRoundComplete(true);
-        setTimeout(() => setShowModal(true), 500);
         await updateRoom();
+        // Auto-start new round after 2 seconds
+        setTimeout(() => {
+          startNewRound();
+        }, 2000);
       }
     } catch (err) {
       console.error('Error submitting guess:', err);
@@ -191,8 +192,6 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       setGameStatus('playing');
       setFeedback([]);
       setLetterStates({});
-      setShowModal(false);
-      setRoundComplete(false);
       
       // Fetch updated room status
       await fetchRoomStatus();
@@ -204,7 +203,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
 
   // Handle key press
   const handleKeyPress = useCallback((key: string) => {
-    if (gameStatus !== 'playing') return;
+    if (gameStatus !== 'playing' || gameWinner) return;
 
     if (key === 'ENTER') {
       submitGuess();
@@ -213,12 +212,12 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
     } else if (currentGuess.length < 5 && /^[A-Z]$/.test(key)) {
       setCurrentGuess(prev => prev + key);
     }
-  }, [currentGuess, gameStatus]);
+  }, [currentGuess, gameStatus, gameWinner]);
 
   // Physical keyboard handler
   useEffect(() => {
     const handlePhysicalKeyPress = (event: KeyboardEvent) => {
-      if (gameStatus !== 'playing') return;
+      if (gameStatus !== 'playing' || gameWinner) return;
 
       const key = event.key.toUpperCase();
       
@@ -233,40 +232,113 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
 
     window.addEventListener('keydown', handlePhysicalKeyPress);
     return () => window.removeEventListener('keydown', handlePhysicalKeyPress);
-  }, [handleKeyPress, gameStatus]);
+  }, [handleKeyPress, gameStatus, gameWinner]);
 
+  // Reset game for new competition
+  const handlePlayAgain = async () => {
+    setGameWinner(null);
+    await startNewRound();
+  };
 
+  // Show winner modal
+  if (gameWinner) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
+        <div className="max-w-2xl w-full bg-gray-800 rounded-lg shadow-xl p-8">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold text-yellow-400 mb-4">🎉 WINNER! 🎉</h1>
+            <h2 className="text-3xl font-bold text-white mb-6">{gameWinner}</h2>
+            <p className="text-xl text-gray-300 mb-8">
+              Reached {winningScore} points and won the competition!
+            </p>
+            
+            <div className="bg-gray-700 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-bold text-white mb-4">Final Standings</h3>
+              <div className="space-y-2">
+                {players.map((player, index) => (
+                  <div
+                    key={player.name}
+                    className={`flex items-center justify-between p-3 rounded-lg ${
+                      player.name === gameWinner
+                        ? 'bg-yellow-600'
+                        : 'bg-gray-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                      </span>
+                      <span className="font-semibold text-white">{player.name}</span>
+                    </div>
+                    <span className="text-2xl font-bold text-white">{player.score}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={handlePlayAgain}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg"
+              >
+                🔄 Play Again
+              </button>
+              <button
+                onClick={onBackToMenu}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg"
+              >
+                🏠 End Game
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen py-8 bg-gray-900">
       <div className="w-full max-w-4xl px-4">
-        <div className="flex justify-start items-center mb-4">
+        <div className="flex justify-between items-center mb-4">
           <button
             onClick={onBackToMenu}
             className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
           >
-            ← Back to Menu
+            ← Leave Game
           </button>
+          <div className="text-white font-bold">
+            Room: <span className="font-mono bg-gray-700 px-3 py-1 rounded">{roomCode}</span>
+          </div>
         </div>
 
         <h1 className="text-4xl font-bold text-center mb-2 text-white">Wordle Competition</h1>
-        <p className="text-center text-gray-400 mb-4">
-          First to {winningScore} points wins! • Round {roundNumber + 1} • {currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} Mode
+        <p className="text-center text-gray-400 mb-2">
+          First to {winningScore} points wins! • Round {roundNumber + 1}
         </p>
         <p className="text-center text-sm text-gray-500 mb-4">
-          🔄 Difficulty rotates: Easy → Medium → Hard → Easy...
+          Current: <span className={`font-bold ${
+            currentDifficulty === 'easy' ? 'text-green-400' :
+            currentDifficulty === 'medium' ? 'text-yellow-400' :
+            'text-red-400'
+          }`}>{currentDifficulty.toUpperCase()}</span> • 
+          Next: Easy → Medium → Hard (rotating)
         </p>
-
-        {gameWinner && (
-          <div className="bg-yellow-500 text-black font-bold text-center py-3 px-4 rounded-lg mb-4 text-xl">
-            🎉 {gameWinner} wins the competition with {winningScore}+ points! 🎉
-          </div>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           <div className="lg:col-span-2">
             {error && (
               <div className="text-center text-red-500 mb-4">{error}</div>
+            )}
+
+            {gameStatus !== 'playing' && (
+              <div className={`text-center mb-4 p-3 rounded-lg ${
+                gameStatus === 'won' ? 'bg-green-600' : 'bg-red-600'
+              }`}>
+                <p className="text-white font-bold text-lg">
+                  {gameStatus === 'won' ? '✅ Correct! Starting next round...' : '❌ Out of guesses! Starting next round...'}
+                </p>
+                <p className="text-white text-sm">The word was: {targetWord}</p>
+              </div>
             )}
 
             <GameBoard
@@ -290,14 +362,6 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       <div className="w-full max-w-2xl px-4">
         <Keyboard onKeyPress={handleKeyPress} letterStates={letterStates} />
       </div>
-
-      <Modal
-        isOpen={showModal}
-        gameWon={gameStatus === 'won'}
-        targetWord={targetWord}
-        onPlayAgain={startNewRound}
-        attempts={guesses.length}
-      />
     </div>
   );
 };
