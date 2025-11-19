@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
+// Get today's date as a seed for consistent daily word
+function getDailySeed(): number {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  // Create a unique number for each day
+  return year * 10000 + month * 100 + day;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const difficulty = searchParams.get('difficulty') || 'easy'; // Default to easy
+    const difficulty = searchParams.get('difficulty') || 'medium'; // Default to medium
     
     // Validate difficulty
     if (!['easy', 'medium', 'hard'].includes(difficulty)) {
@@ -27,11 +37,13 @@ export async function GET(request: Request) {
       );
     }
 
-    // Get random word with specific difficulty
-    const randomIndex = Math.floor(Math.random() * count);
+    // Use daily seed to get the same word for all users today
+    const dailySeed = getDailySeed();
+    const dailyIndex = dailySeed % count;
+    
     const words = await collection
       .find({ difficulty })
-      .skip(randomIndex)
+      .skip(dailyIndex)
       .limit(1)
       .toArray();
     
@@ -47,7 +59,8 @@ export async function GET(request: Request) {
     return NextResponse.json({
       word: word.word,
       wordId: word._id.toString(),
-      difficulty: word.difficulty
+      difficulty: word.difficulty,
+      date: new Date().toISOString().split('T')[0] // Return today's date
     });
   } catch (error) {
     console.error('Error fetching word:', error);

@@ -188,8 +188,49 @@ const GameContainer: React.FC = () => {
     <div className="flex flex-col items-center justify-between min-h-screen py-8">
       <div className="w-full max-w-2xl px-4">
         <h1 className="text-4xl font-bold text-center mb-2">Wordle</h1>
-        <p className="text-center text-gray-400 mb-6">
+        <p className="text-center text-gray-400 mb-4">
           Guess the 5-letter word in {maxGuesses} tries
+        </p>
+        
+        {/* Difficulty Selector */}
+        <div className="flex justify-center gap-2 mb-6">
+          <button
+            onClick={() => setDifficulty('easy')}
+            disabled={gameStatus !== 'playing' && guesses.length > 0}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              difficulty === 'easy'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            } ${gameStatus !== 'playing' && guesses.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            Easy
+          </button>
+          <button
+            onClick={() => setDifficulty('medium')}
+            disabled={gameStatus !== 'playing' && guesses.length > 0}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              difficulty === 'medium'
+                ? 'bg-yellow-500 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            } ${gameStatus !== 'playing' && guesses.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            Medium
+          </button>
+          <button
+            onClick={() => setDifficulty('hard')}
+            disabled={gameStatus !== 'playing' && guesses.length > 0}
+            className={`px-4 py-2 rounded font-semibold transition-colors ${
+              difficulty === 'hard'
+                ? 'bg-red-500 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            } ${gameStatus !== 'playing' && guesses.length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            Hard
+          </button>
+        </div>
+
+        <p className="text-center text-sm text-gray-500 mb-4">
+          🌍 Everyone gets the same {difficulty} word today!
         </p>
         
         {error && (
