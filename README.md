@@ -1,116 +1,187 @@
 # Wordle Game
 
-A 5-letter word guessing game built with Next.js, React, TypeScript, Tailwind CSS, and MongoDB.
+A feature-rich Wordle game built with Next.js, TypeScript, MongoDB, and Tailwind CSS.
 
 ## Features
 
-- 6 attempts to guess a 5-letter word
-- Visual feedback with color-coded tiles:
-  - 🟩 Green: Letter in correct position
-  - 🟨 Yellow: Letter in word but wrong position
-  - ⬜ Gray: Letter not in word
-- Virtual and physical keyboard support
-- Automatic new game on correct guess
-- 500+ five-letter words in database
-- Responsive design for mobile and desktop
+### 🎮 Game Modes
+- **Solo Play**: Play alone with daily words
+- **Competition Mode**: Compete with friends in real-time
 
-## Setup Instructions
+### 🎯 Difficulty Levels
+- **Easy**: 1000+ common words
+- **Medium**: 350+ moderate difficulty words
+- **Hard**: 113 challenging words with tricky patterns
+
+### 🏆 Competition Features
+- Generate unique 6-character codes
+- Join competitions with friends
+- Real-time leaderboard
+- Score tracking (7 - attempts for wins, 0 for losses)
+- See who's on top!
+
+### 📸 Screenshot Feature
+- Capture your game results
+- Share on social media
+- Download as PNG
+
+### 🌍 Daily Word System
+- All players get the same word per day (per difficulty)
+- Fair competition across all players
+
+### 🎨 Visual Feedback
+- 🟩 Green: Correct letter in correct position
+- 🟨 Yellow: Correct letter in wrong position
+- ⬜ Gray: Letter not in word
+- Keyboard tracking of letter states
+
+## Setup
 
 ### Prerequisites
-
-- Node.js 18+ installed
-- MongoDB Atlas account (or local MongoDB instance)
+- Node.js 18+
+- MongoDB Atlas account (free tier works)
 
 ### Installation
 
 1. Clone the repository
-2. Install dependencies:
+```bash
+git clone https://github.com/MayankMehra7/wordle.git
+cd wordle/wordle
+```
+
+2. Install dependencies
 ```bash
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory:
+3. Set up environment variables
+
+Create a `.env.local` file in the root directory:
 ```env
-MONGODB_URI=your_mongodb_connection_string
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
 MONGODB_DB=wordle
 ```
 
-4. Seed the database with words:
+4. Seed the database
 ```bash
 npm run seed
 ```
 
-5. Run the development server:
+This will populate your MongoDB with 1000+ words across all difficulty levels.
+
+5. Run the development server
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+Visit [http://localhost:3000](http://localhost:3000)
 
-## Deployment to Vercel
+## Deployment on Vercel
 
-1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+1. Push your code to GitHub
 
-2. Import your repository in Vercel:
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import your repository
+2. Go to [vercel.com](https://vercel.com) and import your repository
 
-3. Configure environment variables in Vercel:
-   - Go to Project Settings → Environment Variables
-   - Add `MONGODB_URI` with your MongoDB connection string
-   - Add `MONGODB_DB` with value `wordle`
+3. Add environment variables in Vercel dashboard:
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `MONGODB_DB`: `wordle`
 
-4. Deploy:
-   - Vercel will automatically build and deploy your application
-   - Make sure to run the seed script after first deployment to populate the database
+4. Deploy!
 
-5. Run seed script (one-time setup):
-   - You can run the seed script locally with your production MongoDB URI
-   - Or use Vercel CLI: `vercel env pull` then `npm run seed`
+## How to Play
 
-## Project Structure
+### Solo Mode
+1. Select "Solo Play" from the main menu
+2. Choose your difficulty level
+3. Guess the 5-letter word in 6 tries
+4. Use the color feedback to guide your guesses
+5. Take a screenshot of your results!
 
+### Competition Mode
+
+#### Create Competition
+1. Select "Competition" from the main menu
+2. Click "Create Competition"
+3. Enter your name
+4. Choose difficulty level
+5. Share the generated code with friends
+
+#### Join Competition
+1. Select "Competition" from the main menu
+2. Click "Join Competition"
+3. Enter your name
+4. Enter the 6-character code
+5. Start playing!
+
+### Scoring System
+- Win in 1 attempt: 6 points
+- Win in 2 attempts: 5 points
+- Win in 3 attempts: 4 points
+- Win in 4 attempts: 3 points
+- Win in 5 attempts: 2 points
+- Win in 6 attempts: 1 point
+- Loss: 0 points
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React, TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: MongoDB
+- **Deployment**: Vercel
+- **Screenshot**: html2canvas
+
+## Database Collections
+
+### words
+```javascript
+{
+  _id: ObjectId,
+  word: String,        // 5-letter word in uppercase
+  difficulty: String,  // 'easy', 'medium', or 'hard'
+  createdAt: Date
+}
 ```
-├── app/
-│   ├── api/
-│   │   ├── word/          # GET endpoint for random word
-│   │   └── validate/      # POST endpoint for guess validation
-│   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
-├── components/
-│   ├── GameBoard.tsx      # 6x5 grid display
-│   ├── GameContainer.tsx  # Main game logic
-│   ├── Keyboard.tsx       # Virtual keyboard
-│   └── Modal.tsx          # End game modal
-├── lib/
-│   └── mongodb.ts         # Database connection
-├── scripts/
-│   └── seedWords.js       # Database seeding script
-└── package.json
 
+### competitions
+```javascript
+{
+  _id: ObjectId,
+  code: String,        // 6-character unique code
+  difficulty: String,
+  targetWord: String,
+  createdAt: Date,
+  players: [{
+    name: String,
+    guesses: [String],
+    completed: Boolean,
+    attempts: Number,
+    won: Boolean,
+    score: Number
+  }]
+}
 ```
 
-## Technologies Used
+## API Routes
 
-- **Next.js 14**: React framework with App Router
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first styling
-- **MongoDB**: Database for word storage
-- **Vercel**: Deployment platform
+- `GET /api/word?difficulty=<level>` - Get daily word
+- `POST /api/validate` - Validate a guess
+- `POST /api/competition/create` - Create competition
+- `POST /api/competition/join` - Join competition
+- `POST /api/competition/update` - Update player progress
+- `GET /api/competition/status?code=<code>` - Get competition status
 
-## Game Rules
+## Scripts
 
-1. Guess the 5-letter word in 6 tries
-2. Each guess must be a valid 5-letter word
-3. After each guess, tiles change color to show how close you are:
-   - Green: Letter is correct and in the right position
-   - Yellow: Letter is in the word but in the wrong position
-   - Gray: Letter is not in the word
-4. Win by guessing the word correctly
-5. Game automatically starts a new round after a correct guess
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run seed` - Seed database with words
+- `npm test` - Run tests
 
 ## License
 
 MIT
+
+## Author
+
+Mayank Mehra
