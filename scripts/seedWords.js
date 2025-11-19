@@ -1,6 +1,9 @@
 const { MongoClient } = require('mongodb');
 require('dotenv').config({ path: '.env.local' });
 
+// Additional words from user
+const additionalWords = ["about","other","which","their","there","first","would","these","click","price","state","email","world","music","after","video","where","books","links","years","order","items","group","under","games","could","great","hotel","store","terms","right","local","those","using","phone","forum","based","black","check","index","being","women","today","south","pages","found","house","photo","power","while","three","total","place","think","north","posts","media","water","since","guide","board","white","small","times","sites","level","hours","image","title","shall","class","still","money","every","visit","tools","reply","value","press","learn","print","stock","point","sales","large","table","start","model","human","movie","march","yahoo","going","study","staff","again","april","never","users","topic","below","party","login","legal","above","quote","story","rates","young","field","paper","girls","night","texas","poker","issue","range","court","audio","light","write","offer","given","files","event","needs","might","month","major","areas","space","cards","child","enter","share","added","radio","until","color","track","least","trade","david","green","close","drive","short","means","daily","beach","costs","style","front","parts","early","miles","sound","works","rules","final","adult","thing","cheap","third","gifts","cover","often","watch","deals","words","linux","james","heart","error","clear","makes","taken","known","cases","quick","whole","later","basic","shows","along","among","death","speed","brand","stuff","doing","loans","shoes","entry","notes","force","river","album","views","plans","build","types","lines","apply","asked","cross","weeks","lower","union","names","leave","teens","woman","cable","score","shown","flash","ideas","allow","homes","super","asian","cause","focus","rooms","voice","comes","brown","forms","glass","happy","smith","thank","prior","sport","ready","round","built","blood","earth","nokia","basis","award","peter","extra","rated","quite","horse","stars","lists","owner","takes","bring","input","agent","valid","grand","trial","units","wrote","ships","metal","funds","guest","seems","trust","multi","grade","panel","floor","match","plant","sense","stage","goods","maybe","youth","break","dance","apple","enjoy","block","civil","steel","songs","fixed","wrong","hands","paris","fully","worth","peace","coast","grant","agree","blogs","scale","stand","frame","chief","gives","heard","begin","royal","clean","bible","suite","vegas","chris","piece","sheet","seven","older","cells","looks","calls","whose","naked","lives","stone","tests","buyer","steve","label","scott","canon","waste","chair","phase","motor","shirt","crime","count","claim","patch","santa","alone","jones","saint","drugs","joint","fresh","dates","upper","prime","limit","began","louis","steps","shops","creek","urban","tours","labor","admin","heavy","solid","theme","touch","goals","serve","magic","mount","smart","latin","avoid","birth","virus","abuse","facts","faith","chain","moved","reach","sorry","gamma","truth","films","owned","draft","chart","jesus","clubs","equal","codes","kinds","teams","funny","tried","named","laser","harry","taxes","mouse","brain","dream","false","falls","stats","carry","hello","clips","brief","ended","eight","wants","alert","queen","sweet","diego","truck","votes","ocean","signs","depth","train","feeds","route","frank","anime","speak","query","rural","judge","bytes","fight","filed","korea","banks","kelly","leads","brian","miami","wales","minor","noted","spent","davis","helps","cycle","sleep","scene","drink","intel","rings","henry","guess","ahead","devel","delta","cisco","alpha","bonus","adobe","trees","dress","refer","babes","layer","spend","clock","ratio","proof","empty","maine","ideal","specs","parks","cream","boxes","hills","aware","shape","irish","firms","usage","mixed","exist","wheel","angel","width","noise","array","greek","sharp","occur","knows","coach","kevin","plate","logic","sizes","plain","costa","trail","buddy","setup","blues","scope","crazy","bears","mouth","meter","fruit","mysql","lewis","sugar","stick","allen","genre","slide","exact","bound","storm","micro","dolls","paint","delay","pilot","czech","novel","ultra","idaho","plays","truly","lodge","broad","swiss","sarah","clark","foods","guard","newly","raise","drama","bands","lunch","audit","polls","tower","yours","jason","shell","solar","catch","doubt","tasks","const","doors","forth","bruce","split","twice","shift","simon","marks","loved","birds","saved","shots","moore","treat","piano","risks","ports","teach","rapid","hairy","dutch","boots","holds","pulse","metro","strip","pearl","heads","logos","honda","bills","opera","asset","blank","humor","lived","tight","meant","plane","meets","tampa","grace","susan","adams","villa","inner","roman","taste","trips","sides","turns","cache","lease","proud","giant","seats","alarm","usual","angle","vinyl","worst","honor","eagle","pants","nurse","quiet","comic","crown","maker","crack","picks","smoke","craft","apart","blind","coins","gross","epson","actor","finds","fifth","prize","dirty","wayne","alive","prove","wings","ridge","modem","larry","skill","moves","throw","trend","rhode","worse","boats","tells","fiber","graph","talks","bonds","fraud","roger","crash","inter","grove","spray","roads","faces","mayor","yield","hence","radar","lakes","diary","kings","flags","baker","shock","walls","ebony","drawn","beast","dodge","pizza","yards","woods","jokes","twiki","globe","dicke","kerry","ghost","pride","keith","linda","maria","brass","plaza","quest","trans","booty","acres","venue","vital","excel","modes","enemy","wells","opens","lucky","thick","iraqi","vista","chips","terry","flood","arena","grown","jerry","smile","lands","armed","laura","tokyo","nikon","candy","pills","tiger","folks","boost","icons","moral","keeps","pound","roses","bread","tough","gonna","chest","billy","craig","solve","nancy","tones","sight","towns","worry","reads","roles","glory","saudi","fault","karen","jimmy","rugby","fluid","barry","devil","grass","marie","sized","manga","theft","swing","dated","shoot","elite","poems","robot","winds","gnome","roots","noble","shore","loves","loose","slots","rocks","genes","hosts","atlas","feels","ralph","corps","liver","decor","texts","evans","fails","aging","alice","intro","clerk","mills","jeans","fonts","favor","sigma","xhtml","aside","essay","camps","aaron","trace","packs","spoke","arrow","rough","weird","holes","blade","meals","robin","strap","crowd","cloud","valve","knife","shelf","liked","adopt","fotos","outer","tales","islam","nodes","seeds","cited","skype","tired","steam","acute","stood","carol","stack","curve","amber","trunk","waves","camel","lamps","juice","chase","sauce","beads","flows","fewer","proxy","lanka","voted","bikes","gates","slave","lycos","zdnet","combo","haven","charm","basin","ranch","drunk","toner","latex","delhi","alien","broke","nylon","discs","rocky","fleet","bunch","cents","omega","civic","saver","grill","grain","wanna","seeks","gains","spots","salon","turbo","thats","aimed","reset","brush","spare","kodak","skirt","honey","gauge","faced","sixth","farms","cheat","sandy","macro","laugh","pitch","autos","perry","dozen","teeth","cloth","stamp","lotus","cargo","salem","likes","tapes","zones","races","maple","depot","blend","julie","janet","phpbb","probe","helen","lopez","debug","chuck","ebook","bingo","minds","xanax","sunny","leeds","cedar","blair","hopes","mason","burns","pumps","mario","utils","pairs","chose","blast","tommy","brake","olive","cyber","clone","relay","tears","oasis","angry","lover","rolls","daddy","ferry","omaha","loads","motel","rally","dying","stuck","stops","vocal","organ","lemon","toxic","bench","rider","butts","bobby","sheep","wines","salad","paste","katie","relax","sword","sells","coral","pixel","float","colin","paths","acids","dairy","admit","fancy","squad","wages","males","chaos","wheat","bases","unity","bride","begun","socks","essex","fever","drums","rover","flame","tanks","spell","emily","annex","hints","wired","elvis","argue","arise","jamie","chess","oscar","menus","canal","amino","herbs","lying","drill","bryan","hobby","tries","trick","myers","drops","wider","screw","blame","fifty","uncle","jacob","randy","brick","naval","donna","cabin","eddie","fired","perth","klein","tires","retro","anger","suits","glenn","handy","crops","guild","tribe","batch","alter","edges","twins","amend","chick","thong","medal","walks","booth","indie","bones","breed","polar","msgid","carey","danny","patio","lloyd","beans","ellis","snake","julia","berry","ought","fixes","sends","mazda","timer","tyler","verse","highs","ellen","racks","nasty","tumor","watts","forty","tubes","floyd","queue","skins","exams","welsh","belly","elder","sonic","thumb","twist","ranks","debut","volvo","penny","ivory","remix","alias","newer","spice","ascii","donor","trash","manor","diane","disco","endif","minus","milan","shade","digit","lions","pools","lyric","grave","howto","devon","saves","lobby","punch","gotta","karma","betty","lucas","mardi","shake","holly","silly","mercy","fence","diana","shame","fatal","flesh","jesse","sheer","witch","cohen","puppy","kathy","smell","satin","promo","tunes","lucia","nerve","renew","locks","euros","rebel","hired","hindu","kills","slope","nails","whats","rides","rehab","merit","disks","condo","fairy","shaft","casio","kitty","drain","monte","fires","panic","leone","onion","beats","merry","scuba","verde","dried","derby","annie","derek","steal","fears","tuner","alike","sagem","scout","dealt","bucks","badge","wrist","heath","lexus","realm","jenny","buses","rouge","yeast","kenny","yukon","singh","brook","wives","xerox","sorts","vsnet","papua","armor","viral","pipes","laden","aruba","merge","edgar","dubai","allan","sperm","filme","craps","frost","sally","yacht","tracy","whale","shark","grows","cliff","tract","shine","wendy","diffs","ozone","pasta","serum","swift","inbox","focal","samba","wound","belle","cindy","lined","boxed","cubic","spies","elect","bunny","chevy","tions","flyer","baths","emacs","climb","sparc","dover","token","kinda","dylan","belts","burke","clara","flush","hayes","moses","johns","jewel","teddy","dryer","ruled","funky","joins","scary","mpegs","cakes","mixer","sbjct","tooth","stays","drove","upset","mines","logan","lance","colon","lanes","purse","align","bless","crest","alloy","plots","tulsa","casey","draws","bloom","loops","surge","tahoe","souls","spank","vault","wires","mails","blake","orbit","bacon","paxil","spine","trout","apnic","fatty","joyce","marco","isaac","oxide","badly","scoop","sanyo","blink","carlo","tiles","tamil","fuzzy","grams","forge","dense","brave","awful","meyer","wagon","knock","peers","quilt","notre","mambo","flour","choir","blond","burst","wiley","fibre","daisy","crude","bored","allah","fares","hoped","safer","marsh","ricky","theta","stake","arbor"];
+
 // Easy words - common, simple words
 const easyWords = [
   'ABOUT', 'AFTER', 'AGAIN', 'ALLOW', 'APPLE', 'BEACH', 'BEING', 'BLACK', 'BOARD', 'BREAD',
@@ -17,130 +20,7 @@ const easyWords = [
   'TABLE', 'THANK', 'THEIR', 'THERE', 'THESE', 'THING', 'THINK', 'THREE', 'TODAY', 'TOUCH',
   'TRAIN', 'UNDER', 'UNTIL', 'VISIT', 'VOICE', 'WATCH', 'WATER', 'WHERE', 'WHICH', 'WHILE',
   'WHITE', 'WHOLE', 'WOMAN', 'WORLD', 'WOULD', 'WRITE', 'WRONG', 'YOUNG', 'YOUTH',
-  'CLICK', 'PRICE', 'STATE', 'EMAIL', 'BOOKS', 'LINKS', 'YEARS', 'ORDER', 'ITEMS', 'GAMES',
-  'HOTEL', 'TERMS', 'LOCAL', 'THOSE', 'USING', 'FORUM', 'BASED', 'CHECK', 'INDEX', 'WOMEN',
-  'TODAY', 'SOUTH', 'PAGES', 'PHOTO', 'WHILE', 'TOTAL', 'NORTH', 'POSTS', 'MEDIA', 'SINCE',
-  'GUIDE', 'WHITE', 'TIMES', 'SITES', 'LEVEL', 'HOURS', 'IMAGE', 'TITLE', 'SHALL', 'CLASS',
-  'STILL', 'EVERY', 'TOOLS', 'REPLY', 'VALUE', 'PRESS', 'PRINT', 'STOCK', 'SALES', 'MODEL',
-  'MARCH', 'YAHOO', 'STAFF', 'APRIL', 'USERS', 'TOPIC', 'BELOW', 'LOGIN', 'LEGAL', 'ABOVE',
-  'QUOTE', 'RATES', 'FIELD', 'GIRLS', 'TEXAS', 'POKER', 'ISSUE', 'RANGE', 'COURT', 'AUDIO',
-  'OFFER', 'FILES', 'EVENT', 'NEEDS', 'MIGHT', 'MAJOR', 'AREAS', 'CARDS', 'SHARE', 'ADDED',
-  'UNTIL', 'COLOR', 'TRACK', 'LEAST', 'TRADE', 'DAVID', 'DRIVE', 'MEANS', 'BEACH', 'COSTS',
-  'STYLE', 'PARTS', 'EARLY', 'MILES', 'WORKS', 'RULES', 'FINAL', 'ADULT', 'CHEAP', 'THIRD',
-  'GIFTS', 'COVER', 'WATCH', 'DEALS', 'WORDS', 'LINUX', 'JAMES', 'ERROR', 'MAKES', 'TAKEN',
-  'KNOWN', 'CASES', 'WHOLE', 'SHOWS', 'ALONG', 'AMONG', 'DEATH', 'SPEED', 'BRAND', 'STUFF',
-  'LOANS', 'SHOES', 'ENTRY', 'NOTES', 'FORCE', 'ALBUM', 'VIEWS', 'PLANS', 'TYPES', 'LINES',
-  'APPLY', 'ASKED', 'CROSS', 'WEEKS', 'LOWER', 'UNION', 'NAMES', 'LEAVE', 'TEENS', 'CABLE',
-  'SCORE', 'SHOWN', 'FLASH', 'IDEAS', 'HOMES', 'SUPER', 'ASIAN', 'CAUSE', 'FOCUS', 'ROOMS',
-  'COMES', 'BROWN', 'FORMS', 'HAPPY', 'SMITH', 'PRIOR', 'SPORT', 'ROUND', 'BUILT', 'BLOOD',
-  'NOKIA', 'BASIS', 'AWARD', 'PETER', 'EXTRA', 'RATED', 'QUITE', 'STARS', 'LISTS', 'OWNER',
-  'TAKES', 'INPUT', 'AGENT', 'VALID', 'GRAND', 'TRIAL', 'UNITS', 'WROTE', 'SHIPS', 'METAL',
-  'FUNDS', 'GUEST', 'SEEMS', 'TRUST', 'MULTI', 'GRADE', 'PANEL', 'FLOOR', 'MATCH', 'SENSE',
-  'STAGE', 'GOODS', 'MAYBE', 'BREAK', 'ENJOY', 'BLOCK', 'CIVIL', 'STEEL', 'SONGS', 'FIXED',
-  'HANDS', 'PARIS', 'FULLY', 'WORTH', 'COAST', 'GRANT', 'AGREE', 'BLOGS', 'SCALE', 'FRAME',
-  'CHIEF', 'GIVES', 'HEARD', 'BEGIN', 'ROYAL', 'BIBLE', 'SUITE', 'VEGAS', 'CHRIS', 'PIECE',
-  'SHEET', 'OLDER', 'CELLS', 'LOOKS', 'CALLS', 'WHOSE', 'NAKED', 'LIVES', 'TESTS', 'BUYER',
-  'STEVE', 'LABEL', 'SCOTT', 'CANON', 'WASTE', 'PHASE', 'MOTOR', 'CRIME', 'COUNT', 'CLAIM',
-  'PATCH', 'SANTA', 'ALONE', 'JONES', 'SAINT', 'DRUGS', 'JOINT', 'DATES', 'UPPER', 'PRIME',
-  'LIMIT', 'BEGAN', 'LOUIS', 'STEPS', 'SHOPS', 'CREEK', 'URBAN', 'TOURS', 'LABOR', 'ADMIN',
-  'SOLID', 'THEME', 'TOUCH', 'GOALS', 'SERVE', 'MOUNT', 'SMART', 'LATIN', 'AVOID', 'BIRTH',
-  'VIRUS', 'ABUSE', 'FACTS', 'FAITH', 'CHAIN', 'MOVED', 'REACH', 'SORRY', 'GAMMA', 'TRUTH',
-  'FILMS', 'OWNED', 'DRAFT', 'CHART', 'JESUS', 'CLUBS', 'EQUAL', 'CODES', 'KINDS', 'TEAMS',
-  'TRIED', 'NAMED', 'LASER', 'HARRY', 'TAXES', 'BRAIN', 'FALSE', 'FALLS', 'STATS', 'CARRY',
-  'HELLO', 'CLIPS', 'BRIEF', 'ENDED', 'EIGHT', 'WANTS', 'ALERT', 'SWEET', 'DIEGO', 'TRUCK',
-  'VOTES', 'SIGNS', 'DEPTH', 'FEEDS', 'ROUTE', 'FRANK', 'ANIME', 'SPEAK', 'QUERY', 'RURAL',
-  'JUDGE', 'BYTES', 'FIGHT', 'FILED', 'KOREA', 'BANKS', 'KELLY', 'LEADS', 'BRIAN', 'MIAMI',
-  'WALES', 'MINOR', 'NOTED', 'SPENT', 'DAVIS', 'HELPS', 'CYCLE', 'SCENE', 'INTEL', 'RINGS',
-  'HENRY', 'GUESS', 'AHEAD', 'DEVEL', 'DELTA', 'CISCO', 'ALPHA', 'BONUS', 'ADOBE', 'TREES',
-  'DRESS', 'REFER', 'BABES', 'LAYER', 'CLOCK', 'RATIO', 'PROOF', 'MAINE', 'IDEAL', 'SPECS',
-  'PARKS', 'CREAM', 'BOXES', 'HILLS', 'AWARE', 'IRISH', 'FIRMS', 'USAGE', 'MIXED', 'EXIST',
-  'WHEEL', 'ANGEL', 'WIDTH', 'NOISE', 'ARRAY', 'GREEK', 'SHARP', 'OCCUR', 'KNOWS', 'COACH',
-  'KEVIN', 'PLATE', 'LOGIC', 'SIZES', 'PLAIN', 'COSTA', 'TRAIL', 'BUDDY', 'SETUP', 'BLUES',
-  'SCOPE', 'CRAZY', 'BEARS', 'METER', 'MYSQL', 'LEWIS', 'SUGAR', 'STICK', 'ALLEN', 'GENRE',
-  'SLIDE', 'EXACT', 'BOUND', 'STORM', 'MICRO', 'DOLLS', 'DELAY', 'PILOT', 'CZECH', 'NOVEL',
-  'ULTRA', 'IDAHO', 'PLAYS', 'TRULY', 'LODGE', 'BROAD', 'SWISS', 'SARAH', 'CLARK', 'FOODS',
-  'GUARD', 'NEWLY', 'RAISE', 'DRAMA', 'BANDS', 'AUDIT', 'POLLS', 'TOWER', 'YOURS', 'JASON',
-  'SHELL', 'SOLAR', 'CATCH', 'DOUBT', 'TASKS', 'CONST', 'DOORS', 'FORTH', 'BRUCE', 'SPLIT',
-  'TWICE', 'SHIFT', 'SIMON', 'MARKS', 'LOVED', 'BIRDS', 'SAVED', 'SHOTS', 'MOORE', 'TREAT',
-  'PIANO', 'RISKS', 'PORTS', 'TEACH', 'RAPID', 'HAIRY', 'DUTCH', 'BOOTS', 'HOLDS', 'PULSE',
-  'METRO', 'STRIP', 'PEARL', 'HEADS', 'LOGOS', 'HONDA', 'BILLS', 'OPERA', 'ASSET', 'BLANK',
-  'HUMOR', 'LIVED', 'TIGHT', 'MEANT', 'PLANE', 'MEETS', 'TAMPA', 'GRACE', 'SUSAN', 'ADAMS',
-  'VILLA', 'INNER', 'ROMAN', 'TASTE', 'TRIPS', 'SIDES', 'TURNS', 'CACHE', 'LEASE', 'PROUD',
-  'GIANT', 'SEATS', 'ALARM', 'USUAL', 'ANGLE', 'VINYL', 'WORST', 'HONOR', 'EAGLE', 'PANTS',
-  'NURSE', 'COMIC', 'CROWN', 'MAKER', 'CRACK', 'PICKS', 'SMOKE', 'CRAFT', 'APART', 'BLIND',
-  'COINS', 'GROSS', 'EPSON', 'ACTOR', 'FINDS', 'FIFTH', 'PRIZE', 'DIRTY', 'WAYNE', 'ALIVE',
-  'PROVE', 'WINGS', 'RIDGE', 'MODEM', 'LARRY', 'SKILL', 'MOVES', 'THROW', 'TREND', 'RHODE',
-  'WORSE', 'BOATS', 'TELLS', 'FIBER', 'GRAPH', 'TALKS', 'BONDS', 'FRAUD', 'ROGER', 'CRASH',
-  'INTER', 'GROVE', 'SPRAY', 'ROADS', 'FACES', 'MAYOR', 'YIELD', 'HENCE', 'RADAR', 'LAKES',
-  'DIARY', 'KINGS', 'FLAGS', 'BAKER', 'SHOCK', 'WALLS', 'EBONY', 'DRAWN', 'BEAST', 'DODGE',
-  'PIZZA', 'YARDS', 'WOODS', 'JOKES', 'TWIKI', 'GLOBE', 'DICKE', 'KERRY', 'GHOST', 'PRIDE',
-  'KEITH', 'LINDA', 'MARIA', 'BRASS', 'PLAZA', 'QUEST', 'TRANS', 'BOOTY', 'ACRES', 'VENUE',
-  'VITAL', 'EXCEL', 'MODES', 'ENEMY', 'WELLS', 'OPENS', 'LUCKY', 'THICK', 'IRAQI', 'VISTA',
-  'CHIPS', 'TERRY', 'FLOOD', 'ARENA', 'GROWN', 'JERRY', 'LANDS', 'ARMED', 'LAURA', 'TOKYO',
-  'NIKON', 'CANDY', 'PILLS', 'TIGER', 'FOLKS', 'BOOST', 'ICONS', 'MORAL', 'KEEPS', 'POUND',
-  'ROSES', 'TOUGH', 'GONNA', 'CHEST', 'BILLY', 'CRAIG', 'SOLVE', 'NANCY', 'TONES', 'SIGHT',
-  'TOWNS', 'WORRY', 'READS', 'ROLES', 'GLORY', 'SAUDI', 'FAULT', 'KAREN', 'JIMMY', 'RUGBY',
-  'FLUID', 'BARRY', 'DEVIL', 'MARIE', 'SIZED', 'MANGA', 'THEFT', 'SWING', 'DATED', 'SHOOT',
-  'ELITE', 'POEMS', 'ROBOT', 'WINDS', 'GNOME', 'ROOTS', 'NOBLE', 'SHORE', 'LOVES', 'LOOSE',
-  'SLOTS', 'ROCKS', 'GENES', 'HOSTS', 'ATLAS', 'FEELS', 'RALPH', 'CORPS', 'LIVER', 'DECOR',
-  'TEXTS', 'EVANS', 'FAILS', 'AGING', 'ALICE', 'INTRO', 'CLERK', 'MILLS', 'JEANS', 'FONTS',
-  'FAVOR', 'SIGMA', 'XHTML', 'ASIDE', 'ESSAY', 'CAMPS', 'AARON', 'TRACE', 'PACKS', 'SPOKE',
-  'ARROW', 'ROUGH', 'WEIRD', 'HOLES', 'BLADE', 'MEALS', 'ROBIN', 'STRAP', 'CROWD', 'CLOUD',
-  'VALVE', 'KNIFE', 'SHELF', 'LIKED', 'ADOPT', 'FOTOS', 'OUTER', 'TALES', 'ISLAM', 'NODES',
-  'SEEDS', 'CITED', 'SKYPE', 'TIRED', 'STEAM', 'ACUTE', 'STOOD', 'CAROL', 'STACK', 'CURVE',
-  'AMBER', 'TRUNK', 'WAVES', 'CAMEL', 'LAMPS', 'JUICE', 'CHASE', 'SAUCE', 'BEADS', 'FLOWS',
-  'FEWER', 'PROXY', 'LANKA', 'VOTED', 'BIKES', 'GATES', 'SLAVE', 'LYCOS', 'ZDNET', 'COMBO',
-  'HAVEN', 'CHARM', 'BASIN', 'RANCH', 'DRUNK', 'TONER', 'LATEX', 'DELHI', 'ALIEN', 'BROKE',
-  'NYLON', 'DISCS', 'ROCKY', 'FLEET', 'BUNCH', 'CENTS', 'OMEGA', 'CIVIC', 'SAVER', 'GRILL',
-  'GRAIN', 'WANNA', 'SEEKS', 'GAINS', 'SPOTS', 'SALON', 'TURBO', 'THATS', 'AIMED', 'RESET',
-  'BRUSH', 'SPARE', 'KODAK', 'SKIRT', 'HONEY', 'GAUGE', 'FACED', 'SIXTH', 'FARMS', 'CHEAT',
-  'SANDY', 'MACRO', 'PITCH', 'AUTOS', 'PERRY', 'DOZEN', 'TEETH', 'CLOTH', 'STAMP', 'LOTUS',
-  'CARGO', 'SALEM', 'LIKES', 'TAPES', 'ZONES', 'RACES', 'MAPLE', 'DEPOT', 'BLEND', 'JULIE',
-  'JANET', 'PHPBB', 'PROBE', 'HELEN', 'LOPEZ', 'DEBUG', 'CHUCK', 'EBOOK', 'BINGO', 'MINDS',
-  'XANAX', 'SUNNY', 'LEEDS', 'CEDAR', 'BLAIR', 'HOPES', 'MASON', 'BURNS', 'PUMPS', 'MARIO',
-  'UTILS', 'PAIRS', 'CHOSE', 'BLAST', 'TOMMY', 'BRAKE', 'OLIVE', 'CYBER', 'CLONE', 'RELAY',
-  'TEARS', 'OASIS', 'ANGRY', 'LOVER', 'ROLLS', 'DADDY', 'FERRY', 'OMAHA', 'LOADS', 'MOTEL',
-  'RALLY', 'DYING', 'STUCK', 'STOPS', 'VOCAL', 'ORGAN', 'LEMON', 'TOXIC', 'BENCH', 'RIDER',
-  'BUTTS', 'BOBBY', 'SHEEP', 'WINES', 'SALAD', 'PASTE', 'KATIE', 'RELAX', 'SWORD', 'SELLS',
-  'CORAL', 'PIXEL', 'FLOAT', 'COLIN', 'PATHS', 'ACIDS', 'DAIRY', 'ADMIT', 'FANCY', 'SQUAD',
-  'WAGES', 'MALES', 'CHAOS', 'WHEAT', 'BASES', 'UNITY', 'BRIDE', 'BEGUN', 'SOCKS', 'ESSEX',
-  'FEVER', 'DRUMS', 'ROVER', 'FLAME', 'TANKS', 'SPELL', 'EMILY', 'ANNEX', 'HINTS', 'WIRED',
-  'ELVIS', 'ARGUE', 'ARISE', 'JAMIE', 'CHESS', 'OSCAR', 'MENUS', 'CANAL', 'AMINO', 'HERBS',
-  'LYING', 'DRILL', 'BRYAN', 'HOBBY', 'TRIES', 'TRICK', 'MYERS', 'DROPS', 'WIDER', 'SCREW',
-  'BLAME', 'FIFTY', 'UNCLE', 'JACOB', 'RANDY', 'BRICK', 'NAVAL', 'DONNA', 'CABIN', 'EDDIE',
-  'FIRED', 'PERTH', 'KLEIN', 'TIRES', 'RETRO', 'ANGER', 'SUITS', 'GLENN', 'HANDY', 'CROPS',
-  'GUILD', 'TRIBE', 'BATCH', 'ALTER', 'EDGES', 'TWINS', 'AMEND', 'CHICK', 'THONG', 'MEDAL',
-  'WALKS', 'BOOTH', 'INDIE', 'BONES', 'BREED', 'POLAR', 'MSGID', 'CAREY', 'DANNY', 'PATIO',
-  'LLOYD', 'BEANS', 'ELLIS', 'SNAKE', 'JULIA', 'BERRY', 'OUGHT', 'FIXES', 'SENDS', 'MAZDA',
-  'TIMER', 'TYLER', 'VERSE', 'HIGHS', 'ELLEN', 'RACKS', 'NASTY', 'TUMOR', 'WATTS', 'FORTY',
-  'TUBES', 'FLOYD', 'QUEUE', 'SKINS', 'EXAMS', 'WELSH', 'BELLY', 'ELDER', 'SONIC', 'THUMB',
-  'TWIST', 'RANKS', 'DEBUT', 'VOLVO', 'PENNY', 'IVORY', 'REMIX', 'ALIAS', 'NEWER', 'SPICE',
-  'ASCII', 'DONOR', 'TRASH', 'MANOR', 'DIANE', 'DISCO', 'ENDIF', 'MINUS', 'MILAN', 'SHADE',
-  'DIGIT', 'LIONS', 'POOLS', 'LYRIC', 'GRAVE', 'HOWTO', 'DEVON', 'SAVES', 'LOBBY', 'PUNCH',
-  'GOTTA', 'KARMA', 'BETTY', 'LUCAS', 'MARDI', 'SHAKE', 'HOLLY', 'SILLY', 'MERCY', 'FENCE',
-  'DIANA', 'SHAME', 'FATAL', 'FLESH', 'JESSE', 'SHEER', 'WITCH', 'COHEN', 'PUPPY', 'KATHY',
-  'SMELL', 'SATIN', 'PROMO', 'TUNES', 'LUCIA', 'NERVE', 'RENEW', 'LOCKS', 'EUROS', 'REBEL',
-  'HIRED', 'HINDU', 'KILLS', 'SLOPE', 'NAILS', 'WHATS', 'RIDES', 'REHAB', 'MERIT', 'DISKS',
-  'CONDO', 'FAIRY', 'SHAFT', 'CASIO', 'KITTY', 'DRAIN', 'MONTE', 'FIRES', 'PANIC', 'LEONE',
-  'ONION', 'BEATS', 'MERRY', 'SCUBA', 'VERDE', 'DRIED', 'DERBY', 'ANNIE', 'DEREK', 'STEAL',
-  'FEARS', 'TUNER', 'ALIKE', 'SAGEM', 'SCOUT', 'DEALT', 'BUCKS', 'BADGE', 'WRIST', 'HEATH',
-  'LEXUS', 'REALM', 'JENNY', 'BUSES', 'ROUGE', 'YEAST', 'KENNY', 'YUKON', 'SINGH', 'BROOK',
-  'WIVES', 'XEROX', 'SORTS', 'VSNET', 'PAPUA', 'ARMOR', 'VIRAL', 'PIPES', 'LADEN', 'ARUBA',
-  'MERGE', 'EDGAR', 'DUBAI', 'ALLAN', 'SPERM', 'FILME', 'CRAPS', 'FROST', 'SALLY', 'YACHT',
-  'TRACY', 'WHALE', 'SHARK', 'GROWS', 'CLIFF', 'TRACT', 'SHINE', 'WENDY', 'DIFFS', 'OZONE',
-  'PASTA', 'SERUM', 'SWIFT', 'INBOX', 'FOCAL', 'SAMBA', 'WOUND', 'BELLE', 'CINDY', 'LINED',
-  'BOXED', 'CUBIC', 'SPIES', 'ELECT', 'BUNNY', 'CHEVY', 'TIONS', 'FLYER', 'BATHS', 'EMACS',
-  'CLIMB', 'SPARC', 'DOVER', 'TOKEN', 'KINDA', 'DYLAN', 'BELTS', 'BURKE', 'CLARA', 'FLUSH',
-  'HAYES', 'MOSES', 'JOHNS', 'JEWEL', 'TEDDY', 'DRYER', 'RULED', 'FUNKY', 'JOINS', 'SCARY',
-  'MPEGS', 'CAKES', 'MIXER', 'SBJCT', 'TOOTH', 'STAYS', 'DROVE', 'UPSET', 'MINES', 'LOGAN',
-  'LANCE', 'COLON', 'LANES', 'PURSE', 'ALIGN', 'BLESS', 'CREST', 'ALLOY', 'PLOTS', 'TULSA',
-  'CASEY', 'DRAWS', 'BLOOM', 'LOOPS', 'SURGE', 'TAHOE', 'SOULS', 'SPANK', 'VAULT', 'WIRES',
-  'MAILS', 'BLAKE', 'ORBIT', 'BACON', 'PAXIL', 'SPINE', 'TROUT', 'APNIC', 'FATTY', 'JOYCE',
-  'MARCO', 'ISAAC', 'OXIDE', 'BADLY', 'SCOOP', 'SANYO', 'BLINK', 'CARLO', 'TILES', 'TAMIL',
-  'FUZZY', 'GRAMS', 'FORGE', 'DENSE', 'BRAVE', 'AWFUL', 'MEYER', 'WAGON', 'KNOCK', 'PEERS',
-  'QUILT', 'NOTRE', 'MAMBO', 'FLOUR', 'CHOIR', 'BLOND', 'BURST', 'WILEY', 'FIBRE', 'DAISY',
-  'CRUDE', 'BORED', 'ALLAH', 'FARES', 'HOPED', 'SAFER', 'MARSH', 'RICKY', 'THETA', 'STAKE',
-  'ARBOR'
+  ...additionalWords.map(w => w.toUpperCase())
 ];
 
 // Medium words - less common, moderate difficulty
@@ -200,7 +80,10 @@ const hardWords = [
   'ZONAL', 'ZONED', 'ZOOMS'
 ];
 
-const allWords = [...easyWords, ...mediumWords, ...hardWords];
+// Remove duplicates
+const uniqueEasy = [...new Set(easyWords)];
+const uniqueMedium = [...new Set(mediumWords)];
+const uniqueHard = [...new Set(hardWords)];
 
 async function seedDatabase() {
   const uri = process.env.MONGODB_URI;
@@ -226,17 +109,17 @@ async function seedDatabase() {
 
     // Insert words with difficulty levels
     const wordDocuments = [
-      ...easyWords.map(word => ({
+      ...uniqueEasy.map(word => ({
         word: word.toUpperCase(),
         difficulty: 'easy',
         createdAt: new Date()
       })),
-      ...mediumWords.map(word => ({
+      ...uniqueMedium.map(word => ({
         word: word.toUpperCase(),
         difficulty: 'medium',
         createdAt: new Date()
       })),
-      ...hardWords.map(word => ({
+      ...uniqueHard.map(word => ({
         word: word.toUpperCase(),
         difficulty: 'hard',
         createdAt: new Date()

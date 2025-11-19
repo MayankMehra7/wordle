@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { captureScreenshot, downloadScreenshot, shareScreenshot } from '@/lib/screenshot';
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,7 +12,27 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, gameWon, targetWord, onPlayAgain, attempts }) => {
+  const [screenshotLoading, setScreenshotLoading] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleScreenshot = async () => {
+    setScreenshotLoading(true);
+    try {
+      const blob = await captureScreenshot('game-board-container');
+      if (blob) {
+        // Try to share, if not supported, download
+        const shared = await shareScreenshot(blob);
+        if (!shared) {
+          downloadScreenshot(blob, `wordle-${gameWon ? 'win' : 'result'}-${Date.now()}.png`);
+        }
+      }
+    } catch (error) {
+      console.error('Screenshot error:', error);
+    } finally {
+      setScreenshotLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -31,12 +52,22 @@ const Modal: React.FC<ModalProps> = ({ isOpen, gameWon, targetWord, onPlayAgain,
           <p className="text-4xl font-bold text-correct tracking-wider">{targetWord}</p>
         </div>
 
-        <button
-          onClick={onPlayAgain}
-          className="bg-correct hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg"
-        >
-          Play Again
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={handleScreenshot}
+            disabled={screenshotLoading}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {screenshotLoading ? '📸 Capturing...' : '📸 Screenshot'}
+          </button>
+
+          <button
+            onClick={onPlayAgain}
+            className="bg-correct hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg"
+          >
+            Play Again
+          </button>
+        </div>
       </div>
     </div>
   );
