@@ -1,187 +1,255 @@
-# Wordle Game
+# 🎮 Wordle Game - Multiplayer Edition
 
-A feature-rich Wordle game built with Next.js, TypeScript, MongoDB, and Tailwind CSS.
+A feature-rich Wordle clone built with Next.js, TypeScript, MongoDB, and Tailwind CSS. Play solo or compete with friends in real-time!
 
-## Features
+## ✨ Features
 
-### 🎮 Game Modes
-- **Solo Play**: Play alone with daily words
-- **Competition Mode**: Compete with friends in real-time
+### 🎯 Core Gameplay
+- **6 Attempts**: Guess the 5-letter word in 6 tries
+- **Color-Coded Feedback**:
+  - 🟩 Green: Letter in correct position
+  - 🟨 Yellow: Letter in word but wrong position
+  - ⬜ Gray: Letter not in word
+- **Virtual & Physical Keyboard**: Click on-screen or use your keyboard
+- **Daily Word**: Everyone gets the same word each day
 
-### 🎯 Difficulty Levels
-- **Easy**: 1000+ common words
-- **Medium**: 350+ moderate difficulty words
+### 🎚️ Difficulty Levels
+- **Easy**: 657 common words
+- **Medium**: 368 moderate difficulty words
 - **Hard**: 113 challenging words with tricky patterns
+- **Total**: 1,138 five-letter words!
 
-### 🏆 Competition Features
-- Generate unique 6-character codes
-- Join competitions with friends
-- Real-time leaderboard
-- Score tracking (7 - attempts for wins, 0 for losses)
-- See who's on top!
+### 🏆 Multiplayer Competition Mode
+- **Create Room**: Generate a unique 6-character room code
+- **Join Room**: Enter a code to join friends
+- **Real-time Leaderboard**: See who's winning live
+- **Scoring System**: Fewer attempts = more points (max 6 points)
+- **Same Word**: All players in a room get the same word
 
 ### 📸 Screenshot Feature
 - Capture your game results
-- Share on social media
-- Download as PNG
+- Share your victories
+- Download as PNG image
 
 ### 🌍 Daily Word System
-- All players get the same word per day (per difficulty)
-- Fair competition across all players
+- All solo players worldwide get the same word per difficulty each day
+- Changes daily at midnight
+- Fair competition for everyone
 
-### 🎨 Visual Feedback
-- 🟩 Green: Correct letter in correct position
-- 🟨 Yellow: Correct letter in wrong position
-- ⬜ Gray: Letter not in word
-- Keyboard tracking of letter states
-
-## Setup
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- MongoDB Atlas account (free tier works)
+- Node.js 18+ installed
+- MongoDB Atlas account (free tier works!)
+- Git
 
 ### Installation
 
-1. Clone the repository
+1. **Clone the repository**
 ```bash
 git clone https://github.com/MayankMehra7/wordle.git
 cd wordle/wordle
 ```
 
-2. Install dependencies
+2. **Install dependencies**
 ```bash
 npm install
 ```
 
-3. Set up environment variables
+3. **Set up environment variables**
 
 Create a `.env.local` file in the root directory:
+
 ```env
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/?retryWrites=true&w=majority
 MONGODB_DB=wordle
 ```
 
-4. Seed the database
+4. **Seed the database**
 ```bash
 npm run seed
 ```
 
-This will populate your MongoDB with 1000+ words across all difficulty levels.
+This will populate your MongoDB with 1,138 five-letter words across all difficulty levels.
 
-5. Run the development server
+5. **Run the development server**
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Deployment on Vercel
+## 🎮 How to Play
 
-1. Push your code to GitHub
+### Solo Mode
+1. Click "Play Solo" from the main menu
+2. Select difficulty (Easy/Medium/Hard)
+3. Start guessing!
+4. Everyone playing solo gets the same daily word
 
-2. Go to [vercel.com](https://vercel.com) and import your repository
+### Multiplayer Competition
+1. Click "Create Competition" or "Join Competition"
+2. **To Create**:
+   - Enter your name
+   - Choose difficulty
+   - Share the 6-character room code with friends
+3. **To Join**:
+   - Enter your name
+   - Enter the room code from your friend
+4. Compete to solve the word in fewer attempts!
+5. Watch the leaderboard update in real-time
 
-3. Add environment variables in Vercel dashboard:
+## 📊 Scoring System (Multiplayer)
+
+Points are awarded based on how many attempts it takes to solve:
+- Solve in 1 attempt: **6 points** 🏆
+- Solve in 2 attempts: **5 points**
+- Solve in 3 attempts: **4 points**
+- Solve in 4 attempts: **3 points**
+- Solve in 5 attempts: **2 points**
+- Solve in 6 attempts: **1 point**
+- Failed to solve: **0 points**
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: MongoDB Atlas
+- **Screenshot**: html2canvas
+- **Deployment**: Vercel-ready
+
+## 📁 Project Structure
+
+```
+wordle/
+├── app/
+│   ├── api/
+│   │   ├── room/
+│   │   │   ├── create/route.ts    # Create competition room
+│   │   │   ├── join/route.ts      # Join competition room
+│   │   │   ├── update/route.ts    # Update player progress
+│   │   │   └── status/route.ts    # Get leaderboard
+│   │   ├── validate/route.ts      # Validate guesses
+│   │   └── word/route.ts          # Get daily word
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx                   # Main entry point
+├── components/
+│   ├── GameBoard.tsx              # 6x5 game grid
+│   ├── GameContainer.tsx          # Main game logic
+│   ├── Keyboard.tsx               # Virtual keyboard
+│   ├── Leaderboard.tsx            # Multiplayer leaderboard
+│   ├── Modal.tsx                  # End game modal
+│   └── ModeSelector.tsx           # Game mode selection
+├── lib/
+│   ├── mongodb.ts                 # Database connection
+│   └── screenshot.ts              # Screenshot utilities
+├── scripts/
+│   └── seedWords.js               # Database seeding script
+└── .env.local                     # Environment variables
+```
+
+## 🚀 Deployment to Vercel
+
+1. **Push to GitHub** (already done!)
+
+2. **Import to Vercel**:
+   - Go to [vercel.com](https://vercel.com)
+   - Click "Import Project"
+   - Select your GitHub repository
+   - Choose the `wordle` folder as root directory
+
+3. **Add Environment Variables**:
    - `MONGODB_URI`: Your MongoDB connection string
    - `MONGODB_DB`: `wordle`
 
-4. Deploy!
+4. **Deploy!**
+   - Vercel will automatically build and deploy
+   - Your app will be live in minutes
 
-## How to Play
+## 🎨 Features Breakdown
 
-### Solo Mode
-1. Select "Solo Play" from the main menu
-2. Choose your difficulty level
-3. Guess the 5-letter word in 6 tries
-4. Use the color feedback to guide your guesses
-5. Take a screenshot of your results!
+### Database Collections
 
-### Competition Mode
-
-#### Create Competition
-1. Select "Competition" from the main menu
-2. Click "Create Competition"
-3. Enter your name
-4. Choose difficulty level
-5. Share the generated code with friends
-
-#### Join Competition
-1. Select "Competition" from the main menu
-2. Click "Join Competition"
-3. Enter your name
-4. Enter the 6-character code
-5. Start playing!
-
-### Scoring System
-- Win in 1 attempt: 6 points
-- Win in 2 attempts: 5 points
-- Win in 3 attempts: 4 points
-- Win in 4 attempts: 3 points
-- Win in 5 attempts: 2 points
-- Win in 6 attempts: 1 point
-- Loss: 0 points
-
-## Tech Stack
-
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: MongoDB
-- **Deployment**: Vercel
-- **Screenshot**: html2canvas
-
-## Database Collections
-
-### words
+**words** collection:
 ```javascript
 {
   _id: ObjectId,
-  word: String,        // 5-letter word in uppercase
-  difficulty: String,  // 'easy', 'medium', or 'hard'
+  word: "HELLO",
+  difficulty: "easy",
   createdAt: Date
 }
 ```
 
-### competitions
+**rooms** collection:
 ```javascript
 {
-  _id: ObjectId,
-  code: String,        // 6-character unique code
-  difficulty: String,
-  targetWord: String,
+  roomCode: "ABC123",
+  difficulty: "medium",
+  targetWord: "HELLO",
+  players: [
+    {
+      name: "Player1",
+      score: 5,
+      attempts: 2,
+      completed: true,
+      guesses: ["WORLD", "HELLO"],
+      joinedAt: Date
+    }
+  ],
   createdAt: Date,
-  players: [{
-    name: String,
-    guesses: [String],
-    completed: Boolean,
-    attempts: Number,
-    won: Boolean,
-    score: Number
-  }]
+  expiresAt: Date
 }
 ```
 
-## API Routes
+## 🔧 Available Scripts
 
-- `GET /api/word?difficulty=<level>` - Get daily word
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run seed         # Seed database with words
+npm test             # Run tests
+npm run test:watch   # Run tests in watch mode
+```
+
+## 🎯 API Endpoints
+
+- `GET /api/word?difficulty=easy` - Get daily word
 - `POST /api/validate` - Validate a guess
-- `POST /api/competition/create` - Create competition
-- `POST /api/competition/join` - Join competition
-- `POST /api/competition/update` - Update player progress
-- `GET /api/competition/status?code=<code>` - Get competition status
+- `POST /api/room/create` - Create competition room
+- `POST /api/room/join` - Join competition room
+- `POST /api/room/update` - Update player progress
+- `GET /api/room/status?roomCode=ABC123` - Get room status
 
-## Scripts
+## 🤝 Contributing
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run seed` - Seed database with words
-- `npm test` - Run tests
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest new features
+- Submit pull requests
 
-## License
+## 📝 License
 
-MIT
+This project is open source and available under the MIT License.
 
-## Author
+## 🙏 Acknowledgments
 
-Mayank Mehra
+- Inspired by the original Wordle by Josh Wardle
+- Word list curated from common English words
+- Built with ❤️ using Next.js and MongoDB
+
+## 📞 Support
+
+If you encounter any issues:
+1. Check that MongoDB is properly connected
+2. Ensure you've run `npm run seed`
+3. Verify environment variables are set correctly
+4. Check the browser console for errors
+
+---
+
+**Enjoy playing Wordle! 🎮**
+
+Made with 💚 by [MayankMehra7](https://github.com/MayankMehra7)
