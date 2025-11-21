@@ -43,9 +43,59 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
   const [gameWinner, setGameWinner] = useState<string | null>(null);
   const [currentDifficulty, setCurrentDifficulty] = useState<string>(difficulty);
   const [roundNumber, setRoundNumber] = useState<number>(0);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const maxGuesses = 6;
   const winningScore = 200;
+
+  // Handle leaving the game
+  const handleLeaveGame = useCallback(async () => {
+    try {
+      // Use sendBeacon for reliable execution on unload, or fetch with keepalive
+      const data = JSON.stringify({ roomCode, playerName });
+      const blob = new Blob([data], { type: 'application/json' });
+      navigator.sendBeacon('/api/room/leave', blob);
+    } catch (err) {
+      console.error('Error leaving room:', err);
+    }
+    onBackToMenu();
+  }, [roomCode, playerName, onBackToMenu]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    const handleUnload = () => {
+      const data = JSON.stringify({ roomCode, playerName });
+      const blob = new Blob([data], { type: 'application/json' });
+      navigator.sendBeacon('/api/room/leave', blob);
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      // Note: We don't call handleUnload() here because it might trigger when just navigating
+      // within the app if the component unmounts. But since we want to remove the player
+      // whenever they leave this screen, we SHOULD call it.
+      // However, handleLeaveGame handles the explicit button click.
+      // If the user navigates back via browser back button, this cleanup runs.
+      // So yes, we should probably call it.
+      // But navigator.sendBeacon might be too aggressive if we just switch tabs? No, unmount is unmount.
+      handleUnload();
+    };
+  }, [roomCode, playerName]);
+
+  // Handle countdown
+  useEffect(() => {
+    if (countdown === null) return;
+
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCountdown(null);
+      startNewRound();
+    }
+  }, [countdown]);
 
   // Fetch room status
   const fetchRoomStatus = useCallback(async () => {
@@ -54,9 +104,28 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       if (response.ok) {
         const data = await response.json();
         setPlayers(data.players);
-        setCurrentDifficulty(data.currentDifficulty || data.difficulty);
-        setRoundNumber(data.roundNumber || 0);
-        
+
+        // Check for round change
+        const serverRound = data.roundNumber || 0;
+        if (serverRound > roundNumber) {
+          // New round started!
+          setRoundNumber(serverRound);
+          setCurrentDifficulty(data.currentDifficulty || data.difficulty);
+          setTargetWord(data.targetWord);
+
+          // Reset game state for new round
+          setGuesses([]);
+          setCurrentGuess('');
+          setGameStatus('playing');
+          setFeedback([]);
+          setLetterStates({});
+          setGameWinner(null);
+          setCountdown(null); // Cancel any local countdown if server moved ahead
+        } else {
+          // Just update info if same round
+          setCurrentDifficulty(data.currentDifficulty || data.difficulty);
+        }
+
         // Check if anyone reached 200 points
         const winner = data.players.find((p: Player) => p.score >= winningScore);
         if (winner && !gameWinner) {
@@ -66,7 +135,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
     } catch (err) {
       console.error('Error fetching room status:', err);
     }
-  }, [roomCode, gameWinner]);
+  }, [roomCode, gameWinner, roundNumber]);
 
   // Poll room status every 3 seconds
   useEffect(() => {
@@ -98,11 +167,11 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
   // Update letter states based on feedback
   const updateLetterStates = (guess: string, guessFeedback: LetterStatus[]) => {
     const newStates = { ...letterStates };
-    
+
     guess.split('').forEach((letter, index) => {
       const status = guessFeedback[index];
       const currentStatus = newStates[letter];
-      
+
       if (status === 'correct') {
         newStates[letter] = 'correct';
       } else if (status === 'present' && currentStatus !== 'correct') {
@@ -111,7 +180,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
         newStates[letter] = 'absent';
       }
     });
-    
+
     setLetterStates(newStates);
   };
 
@@ -148,10 +217,8 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       if (data.isCorrect) {
         setGameStatus('won');
         await updateRoom(newGuesses, true);
-        // Auto-start new round after 2 seconds
-        setTimeout(() => {
-          startNewRound();
-        }, 2000);
+        // Start countdown for new round (5 seconds)
+        setCountdown(5);
         return;
       }
 
@@ -159,10 +226,8 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       if (newGuesses.length >= maxGuesses) {
         setGameStatus('lost');
         await updateRoom(newGuesses, false);
-        // Auto-start new round after 2 seconds
-        setTimeout(() => {
-          startNewRound();
-        }, 2000);
+        // Start countdown for new round (5 seconds)
+        setCountdown(5);
       }
     } catch (err) {
       console.error('Error submitting guess:', err);
@@ -178,11 +243,11 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomCode }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch word');
       }
-      
+
       const data = await response.json();
       setTargetWord(data.word);
       setCurrentDifficulty(data.difficulty);
@@ -192,7 +257,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       setGameStatus('playing');
       setFeedback([]);
       setLetterStates({});
-      
+
       // Fetch updated room status
       await fetchRoomStatus();
     } catch (err) {
@@ -203,7 +268,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
 
   // Handle key press
   const handleKeyPress = useCallback((key: string) => {
-    if (gameStatus !== 'playing' || gameWinner) return;
+    if (gameStatus !== 'playing' || gameWinner || countdown !== null) return;
 
     if (key === 'ENTER') {
       submitGuess();
@@ -212,15 +277,15 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
     } else if (currentGuess.length < 5 && /^[A-Z]$/.test(key)) {
       setCurrentGuess(prev => prev + key);
     }
-  }, [currentGuess, gameStatus, gameWinner]);
+  }, [currentGuess, gameStatus, gameWinner, countdown]);
 
   // Physical keyboard handler
   useEffect(() => {
     const handlePhysicalKeyPress = (event: KeyboardEvent) => {
-      if (gameStatus !== 'playing' || gameWinner) return;
+      if (gameStatus !== 'playing' || gameWinner || countdown !== null) return;
 
       const key = event.key.toUpperCase();
-      
+
       if (key === 'ENTER') {
         handleKeyPress('ENTER');
       } else if (key === 'BACKSPACE') {
@@ -232,7 +297,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
 
     window.addEventListener('keydown', handlePhysicalKeyPress);
     return () => window.removeEventListener('keydown', handlePhysicalKeyPress);
-  }, [handleKeyPress, gameStatus, gameWinner]);
+  }, [handleKeyPress, gameStatus, gameWinner, countdown]);
 
   // Reset game for new competition
   const handlePlayAgain = async () => {
@@ -251,18 +316,17 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
             <p className="text-xl text-gray-300 mb-8">
               Reached {winningScore} points and won the competition!
             </p>
-            
+
             <div className="bg-gray-700 rounded-lg p-6 mb-8">
               <h3 className="text-xl font-bold text-white mb-4">Final Standings</h3>
               <div className="space-y-2">
                 {players.map((player, index) => (
                   <div
                     key={player.name}
-                    className={`flex items-center justify-between p-3 rounded-lg ${
-                      player.name === gameWinner
+                    className={`flex items-center justify-between p-3 rounded-lg ${player.name === gameWinner
                         ? 'bg-yellow-600'
                         : 'bg-gray-600'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">
@@ -275,7 +339,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
                 ))}
               </div>
             </div>
-            
+
             <div className="flex gap-4 justify-center">
               <button
                 onClick={handlePlayAgain}
@@ -284,7 +348,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
                 🔄 Play Again
               </button>
               <button
-                onClick={onBackToMenu}
+                onClick={handleLeaveGame}
                 className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg"
               >
                 🏠 End Game
@@ -301,7 +365,7 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
       <div className="w-full max-w-4xl px-4">
         <div className="flex justify-between items-center mb-4">
           <button
-            onClick={onBackToMenu}
+            onClick={handleLeaveGame}
             className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
           >
             ← Leave Game
@@ -316,11 +380,10 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
           First to {winningScore} points wins! • Round {roundNumber + 1}
         </p>
         <p className="text-center text-sm text-gray-500 mb-4">
-          Current: <span className={`font-bold ${
-            currentDifficulty === 'easy' ? 'text-green-400' :
-            currentDifficulty === 'medium' ? 'text-yellow-400' :
-            'text-red-400'
-          }`}>{currentDifficulty.toUpperCase()}</span> • 
+          Current: <span className={`font-bold ${currentDifficulty === 'easy' ? 'text-green-400' :
+              currentDifficulty === 'medium' ? 'text-yellow-400' :
+                'text-red-400'
+            }`}>{currentDifficulty.toUpperCase()}</span> •
           Next: Easy → Medium → Hard (rotating)
         </p>
 
@@ -331,13 +394,17 @@ const GameContainerMultiplayer: React.FC<GameContainerMultiplayerProps> = ({
             )}
 
             {gameStatus !== 'playing' && (
-              <div className={`text-center mb-4 p-3 rounded-lg ${
-                gameStatus === 'won' ? 'bg-green-600' : 'bg-red-600'
-              }`}>
+              <div className={`text-center mb-4 p-3 rounded-lg ${gameStatus === 'won' ? 'bg-green-600' : 'bg-red-600'
+                }`}>
                 <p className="text-white font-bold text-lg">
-                  {gameStatus === 'won' ? '✅ Correct! Starting next round...' : '❌ Out of guesses! Starting next round...'}
+                  {gameStatus === 'won' ? '✅ Correct!' : '❌ Out of guesses!'}
                 </p>
                 <p className="text-white text-sm">The word was: {targetWord}</p>
+                {countdown !== null && (
+                  <p className="text-yellow-300 font-bold mt-2 text-xl animate-pulse">
+                    Next round in {countdown}s...
+                  </p>
+                )}
               </div>
             )}
 

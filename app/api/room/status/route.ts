@@ -34,6 +34,7 @@ export async function GET(request: Request) {
       currentDifficulty: room.currentDifficulty || room.difficulty,
       roundNumber: room.roundNumber || 0,
       players: sortedPlayers,
+      targetWord: room.targetWord, // Send target word so clients can update if round changed
       createdAt: room.createdAt,
       expiresAt: room.expiresAt
     });
